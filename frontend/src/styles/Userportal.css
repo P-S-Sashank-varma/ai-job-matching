@@ -1,0 +1,157 @@
+/* General Styling */
+.user-portal {
+    font-family: Arial, sans-serif;
+    background-color: #f1f1f1;
+    height: 100vh;
+  }
+  
+  /* Navbar */
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 15px 30px;
+    color: white;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 100;
+  }
+  
+  /* Logo */
+  .logo {
+    font-size: 26px;
+    font-weight: bold;
+    color: #ff4500;
+  }
+  
+  /* Navigation Links */
+  .nav-links {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .nav-links li {
+    margin-right: 20px;
+  }
+  
+  .nav-links a, .dropdown-btn {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    padding: 10px;
+    transition: color 0.3s ease;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .nav-links a:hover, .dropdown-btn:hover {
+    color: #00aaff;
+  }
+  
+  /* Dropdown Menu */
+  .dropdown {
+    position: relative;
+  }
+  
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.9);
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    list-style: none;
+    padding: 10px 0;
+    min-width: 180px;
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+  }
+  
+  .dropdown-menu li {
+    padding: 10px 20px;
+  }
+  
+  .dropdown-menu li a {
+    text-decoration: none;
+    color: white;
+    display: block;
+  }
+  
+  .dropdown-menu li a:hover {
+    background-color: #00aaff;
+    border-radius: 5px;
+  }
+  
+  /* User Info (Right Side) */
+  .user-info {
+    display: flex;
+    align-items: center;
+  }
+  
+  .user-icon {
+    font-size: 30px;
+    margin-right: 10px;
+    color: white;
+  }
+  
+  .username {
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  /* Resume Upload Section */
+  .resume-section {
+    max-width: 500px;
+    margin: 100px auto 0;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  .resume-section h2 {
+    color: #333;
+  }
+  
+  .resume-form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .resume-form label {
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: left;
+  }
+  
+  .resume-form input {
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+  }
+  
+  .upload-btn {
+    margin-top: 15px;
+    padding: 10px;
+    font-size: 18px;
+    background-color: #32cd32;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .upload-btn:hover {
+    background-color: #228b22;
+  }
+  
