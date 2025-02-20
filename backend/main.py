@@ -1,23 +1,26 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes import auth  
-# Create the FastAPI app instance
-app = FastAPI()# Import the auth router
+from routes.auth import router as auth_router  
+from routes.user_dashboard import router as user_dashboard_router  
+from routes.recruiter_dashboard import router as recruiter_dashboard_router  
 
+app = FastAPI()
 
-# Include the auth router (which contains /register and /login)
-app.include_router(auth.router)
+# Include the routers
+app.include_router(auth_router)
+app.include_router(user_dashboard_router)  
+app.include_router(recruiter_dashboard_router)  
 
-# Allow frontend to communicate with backend (CORS configuration)
+# CORS Configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # React frontend URL
+    allow_origins=["http://localhost:3000"],  
     allow_credentials=True,
-    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, etc.)
-    allow_headers=["*"],  # Allow all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-# Example route (add your other routes here)
+# Root Route (Basic Health Check)
 @app.get("/")
 async def read_root():
-    return {"message": "Welcome to FastAPI!"}
+    return {"message": "Welcome to FastAPI! Backend is running successfully 🚀"}

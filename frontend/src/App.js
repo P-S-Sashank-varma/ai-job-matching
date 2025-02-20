@@ -5,13 +5,14 @@ import Login from "./components/Login";
 import Signup from "./components/Signup";
 import UserPortal from "./components/Userportal";
 import RecruiterDashboard from "./components/RecruiterDashboard";
-import ProtectedRoute from "./components/ProtectedRoute ";  // Import ProtectedRoute
-
+import ProtectedRoute from "./components/ProtectedRoute";  // Import ProtectedRoute
+import Job from "./components/Job";
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/jobs" element={<Job />} /> 
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
@@ -19,7 +20,7 @@ function App() {
         <Route 
           path="/userportal" 
           element={
-            <ProtectedRoute requiredRole="recruiter">
+            <ProtectedRoute requiredRole="user">
               <UserPortal/>
             </ProtectedRoute>
           } 

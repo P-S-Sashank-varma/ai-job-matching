@@ -10,7 +10,7 @@ function Home() {
         <div className="logo">AI Job Portal</div>
         <ul className="nav-links">
           <li><a href="/recruiter-dashboard">Home</a></li>
-          <li><a href="/userportal">Jobs</a></li>
+          <li><a href="/jobs">Jobs</a></li>
 
           <li 
             className="dropdown" 

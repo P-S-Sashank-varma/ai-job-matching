@@ -2,12 +2,16 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import os
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
+# Load environment variables
 load_dotenv()
 
-# MongoDB connection URL
+# MongoDB Connection
 MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017")
-
-# Initialize MongoDB Client
 client = AsyncIOMotorClient(MONGO_URL)
-db = client["SkillSync"]  # Database Name
+
+# Connect to `SkillSync` database
+db = client["SkillSync"]
+
+# Create collections
+user_dashboard_collection = db["user_dashboard"]
+recruiter_dashboard_collection = db["recruiter_dashboard"]
