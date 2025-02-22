@@ -11,15 +11,17 @@ UPLOAD_DIR = "uploads/company_images"
 os.makedirs(UPLOAD_DIR, exist_ok=True) 
 
 
+# ✅ Fix: Include `skills_required` in the API response
 async def serialize_job(job):
     return {
-        "id": str(job["_id"]),
-        "recruiter_name": job.get("recruiter_name", "N/A"),
-        "email": job.get("email", "N/A"),
-        "company": job.get("company", "Unknown"),
-        "job_description": job.get("job_description", "No description provided"),
-        "company_image_filename": job.get("company_image_filename", ""),
-        "company_image_url": f"http://127.0.0.1:8000/get-company-image/{job['company_image_filename']}" if job.get("company_image_filename") else None,
+        "id": str(job["_id"]),  # Convert `_id` from ObjectId to string
+        "recruiter_name": job["recruiter_name"],
+        "email": job["email"],
+        "company": job["company"],
+        "job_description": job["job_description"],
+        "skills_required": job.get("skills_required", "Not specified"),  # ✅ Include skills
+        "company_image_filename": job["company_image_filename"],
+        "company_image_url": f"http://127.0.0.1:8000/get-company-image/{job['company_image_filename']}",
     }
 
 # **🔹 POST Route: Recruiter Posts a Job**
@@ -50,7 +52,7 @@ async def post_job(
             "email": email,
             "company": company,
             "skills_required": skills_required, 
-            "job_description": job_description, # ✅ Store skills required
+            "job_description": job_description, 
             "company_image_filename": image_filename,
             "company_image_url": f"http://127.0.0.1:8000/get-company-image/{image_filename}",
         }

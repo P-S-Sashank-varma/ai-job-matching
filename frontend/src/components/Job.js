@@ -14,6 +14,7 @@ const Job = () => {
           throw new Error("Failed to fetch jobs");
         }
         const data = await response.json();
+        console.log("Fetched jobs:", data); // ✅ Debugging: Check API response
         setJobs(data);
         setLoading(false);
       } catch (error) {
@@ -41,7 +42,8 @@ const Job = () => {
                 <h3>{job.company}</h3>
                 <p><strong>Recruiter:</strong> {job.recruiter_name}</p>
                 <p><strong>Posted On:</strong> {new Date().toLocaleString()}</p>
-                <p><strong>Description:</strong> {job.job_description}</p>
+                <p><strong>Skills Required:</strong> {job.skills_required || "No skills listed"}</p>  {/* ✅ Fix */}
+                <button className="apply-button">AI will APPLY</button>
               </div>
             </div>
           ))}

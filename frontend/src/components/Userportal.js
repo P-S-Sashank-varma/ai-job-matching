@@ -1,4 +1,5 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ Import for redirection
 import "../styles/Userportal.css";
 import { FaUserCircle } from "react-icons/fa";
 
@@ -8,9 +9,19 @@ function UserPortal() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [resumeFile, setResumeFile] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  // ✅ **Use useRef for file input**
   const resumeInputRef = useRef(null);
+  const navigate = useNavigate(); // ✅ Hook for redirection
+
+  // ✅ **Get Logged-in User Info from Token**
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decodedToken = JSON.parse(atob(token.split(".")[1])); // Decode JWT
+      setEmail(decodedToken.email);
+    }
+  }, []);
 
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown);
@@ -18,7 +29,6 @@ function UserPortal() {
 
   const handleResumeUpload = async (event) => {
     event.preventDefault();
-
     if (!resumeFile) {
       alert("Please select a resume file before submitting.");
       return;
@@ -31,31 +41,39 @@ function UserPortal() {
     formData.append("resume", resumeFile);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/user-dashboard", {
+      setLoading(true);
+      
+      // ✅ **Upload Resume**
+      const uploadResponse = await fetch("http://127.0.0.1:8000/upload-resume", {
         method: "POST",
         body: formData,
       });
 
-      const result = await response.json();
-      if (response.ok) {
-        alert("Resume uploaded successfully!");
+      const uploadResult = await uploadResponse.json();
+      if (!uploadResponse.ok) {
+        throw new Error(uploadResult.detail || "Error uploading resume");
+      }
 
-        // ✅ **Fix: Reset file input using ref**
-        if (resumeInputRef.current) {
-          resumeInputRef.current.value = "";
-        }
+      alert("Resume uploaded successfully!");
 
-        // ✅ **Reset other form fields**
-        setName("");
-        setEmail("");
-        setPhone("");
-        setResumeFile(null);
-      } else {
-        alert(`Error: ${result.detail}`);
+      // ✅ **Trigger Resume Parsing**
+      await fetch(`http://127.0.0.1:8000/parse-resume/${email}`);
+
+      // ✅ **Redirect to `/selected-jobs` after processing**
+      navigate("/selected-jobs"); // ✅ Redirect user after success
+
+      // ✅ **Reset Form Fields**
+      setName("");
+      setPhone("");
+      setResumeFile(null);
+      if (resumeInputRef.current) {
+        resumeInputRef.current.value = "";
       }
     } catch (error) {
-      console.error("Error uploading resume:", error);
-      alert("Failed to upload resume. Please try again.");
+      console.error("Error processing resume:", error);
+      alert("Failed to process resume. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -66,7 +84,6 @@ function UserPortal() {
         <div className="logo">AI Job Portal</div>
         <ul className="nav-links">
           <li><a href="/">Home</a></li>
-          {/* Job Roles Dropdown */}
           <li className="dropdown">
             <button className="dropdown-btn" onClick={toggleDropdown}>Job Roles ▼</button>
             {showDropdown && (
@@ -78,10 +95,9 @@ function UserPortal() {
             )}
           </li>
         </ul>
-        {/* User Icon & Username */}
         <div className="user-info">
           <FaUserCircle className="user-icon" />
-          <span className="username">JohnDoe123</span>
+          <span className="username">{email || "User"}</span>
         </div>
       </nav>
 
@@ -93,7 +109,7 @@ function UserPortal() {
           <input type="text" placeholder="Enter your name" value={name} onChange={(e) => setName(e.target.value)} required />
 
           <label>Email:</label>
-          <input type="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <input type="email" value={email} disabled required />
 
           <label>Phone Number:</label>
           <input type="tel" placeholder="Enter phone number" value={phone} onChange={(e) => setPhone(e.target.value)} required />
@@ -103,11 +119,13 @@ function UserPortal() {
             type="file" 
             accept=".pdf,.doc,.docx" 
             onChange={(e) => setResumeFile(e.target.files[0])} 
-            ref={resumeInputRef}  // ✅ Attach ref here
+            ref={resumeInputRef} 
             required 
           />
 
-          <button type="submit" className="upload-btn">Submit</button>
+          <button type="submit" className="upload-btn" disabled={loading}>
+            {loading ? "Processing..." : "Submit"}
+          </button>
         </form>
       </div>
     </div>
