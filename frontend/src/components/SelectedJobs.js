@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
 import "../styles/SelectedJobs.css";
 import { jwtDecode } from "jwt-decode"; // ✅ Correct import
+import { useNavigate } from "react-router-dom"; // ✅ Import for navigation
 
 const SelectedJobs = () => {
   const [matchedJobs, setMatchedJobs] = useState([]); // ✅ Ensure it's an array
   const [loading, setLoading] = useState(true);
   const [userEmail, setUserEmail] = useState("");
+
+  const navigate = useNavigate(); // ✅ ✅ ✅ Move inside the component
 
   // ✅ **Get Logged-in User Info from Token (Stored in LocalStorage)**
   useEffect(() => {
@@ -32,7 +35,7 @@ const SelectedJobs = () => {
 
         const response = await fetch(`http://127.0.0.1:8000/matching-jobs/${userEmail}`, {
           headers: {
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         });
 
@@ -41,7 +44,7 @@ const SelectedJobs = () => {
         }
 
         const data = await response.json();
-        
+
         // ✅ Ensure API response is an array
         if (!Array.isArray(data)) {
           throw new Error("Invalid response format: Expected an array");
@@ -76,7 +79,13 @@ const SelectedJobs = () => {
                 <p><strong>Recruiter:</strong> {job.recruiter_name}</p>
                 <p><strong>Skills Matched:</strong> {job.matched_skills?.join(", ") || "N/A"}</p>
                 <p><strong>Match Percentage:</strong> {job.match_percentage || "0"}%</p>
-                <button className="apply-btn">Ready For AI Interview</button>
+                <button
+  className="apply-btn"
+  onClick={() => navigate(`/ai-hr-interview`)} // ✅ Pass email in URL
+>
+  Ready For AI Interview
+</button>
+
               </div>
             </div>
           ))}
@@ -87,4 +96,3 @@ const SelectedJobs = () => {
 };
 
 export default SelectedJobs;
-

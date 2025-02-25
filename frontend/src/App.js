@@ -8,7 +8,7 @@ import RecruiterDashboard from "./components/RecruiterDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";  // Import ProtectedRoute
 import Job from "./components/Job";
 import SelectedJobs from "./components/SelectedJobs";
-
+import HRInterview from "./components/HRInterview";
 function App() {
   return (
     <Router>
@@ -18,6 +18,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/selected-jobs" element={<SelectedJobs />} />
+        <Route path="/ai-hr-interview" element={<HRInterview/>}/>
         {/* Protected route for User Portal */}
         <Route 
           path="/userportal" 
