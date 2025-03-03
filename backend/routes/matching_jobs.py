@@ -27,7 +27,7 @@ async def get_matching_jobs(user: dict = Depends(get_current_user)):
         matched_skills = user_skills.intersection(required_skills)
         match_percentage = (len(matched_skills) / len(required_skills)) * 100 if required_skills else 0
 
-        if match_percentage >= 80:  # ✅ Only show jobs with 80% match
+        if match_percentage >= 80:  
             matched_jobs.append({
                 "id": str(job["_id"]),
                 "recruiter_name": job["recruiter_name"],

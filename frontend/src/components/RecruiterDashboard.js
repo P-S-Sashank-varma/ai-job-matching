@@ -7,9 +7,8 @@ function RecruiterDashboard() {
   const [company, setCompany] = useState("");
   const [companyImage, setCompanyImage] = useState(null);
   const [jobDescription, setJobDescription] = useState("");
-  const [skillsRequired, setSkillsRequired] = useState(""); // ✅ New state for skills required
+  const [skillsRequired, setSkillsRequired] = useState("");
 
-  // ✅ **Use useRef for file input**
   const companyImageInputRef = useRef(null);
 
   const handleCompanyImageUpload = (event) => {
@@ -29,7 +28,7 @@ function RecruiterDashboard() {
     formData.append("email", email);
     formData.append("company", company);
     formData.append("job_description", jobDescription);
-    formData.append("skills_required", skillsRequired); // ✅ Add skills required field
+    formData.append("skills_required", skillsRequired);
     formData.append("company_image", companyImage);
 
     try {
@@ -42,17 +41,15 @@ function RecruiterDashboard() {
       if (response.ok) {
         alert("Job posted successfully!");
 
-        // ✅ **Fix: Reset file input using ref**
         if (companyImageInputRef.current) {
           companyImageInputRef.current.value = "";
         }
 
-        // ✅ **Reset other form fields**
         setRecruiterName("");
         setEmail("");
         setCompany("");
         setJobDescription("");
-        setSkillsRequired(""); // ✅ Reset skills required field
+        setSkillsRequired("");
         setCompanyImage(null);
       } else {
         alert(`Error: ${result.detail}`);
@@ -65,62 +62,27 @@ function RecruiterDashboard() {
 
   return (
     <div className="recruiter-dashboard">
-      <h2>Recruiter Dashboard</h2>
+      <h2><i className="fa-solid fa-briefcase"></i> Recruiter Dashboard</h2>
       <form onSubmit={handleSubmit}>
-        <label>Recruiter Name:</label>
-        <input
-          type="text"
-          value={recruiterName}
-          onChange={(e) => setRecruiterName(e.target.value)}
-          required
-        />
+        <label><i className="fa-solid fa-user"></i> Recruiter Name:</label>
+        <input type="text" value={recruiterName} onChange={(e) => setRecruiterName(e.target.value)} required />
 
-        <label>Email:</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+        <label><i className="fa-solid fa-envelope"></i> Email:</label>
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
 
-        <label>Company Name:</label>
-        <input
-          type="text"
-          value={company}
-          onChange={(e) => setCompany(e.target.value)}
-          required
-        />
+        <label><i className="fa-solid fa-building"></i> Company Name:</label>
+        <input type="text" value={company} onChange={(e) => setCompany(e.target.value)} required />
 
-        <label>Upload Company Image:</label>
-        <input 
-          type="file" 
-          accept="image/*" 
-          onChange={handleCompanyImageUpload} 
-          ref={companyImageInputRef}  // ✅ Attach ref here
-          required 
-        />
+        <label><i className="fa-solid fa-file-image"></i> Upload Company Image:</label>
+        <input type="file" accept="image/*" onChange={handleCompanyImageUpload} ref={companyImageInputRef} required />
 
+        <label><i className="fa-solid fa-code"></i> Skills Required:</label>
+        <input type="text" placeholder="E.g. JavaScript, React, Python" value={skillsRequired} onChange={(e) => setSkillsRequired(e.target.value)} required />
 
-<label>Skills Required:</label>
-        <input
-          type="text"
-          placeholder="E.g. JavaScript, React, Python"
-          value={skillsRequired}
-          onChange={(e) => setSkillsRequired(e.target.value)}
-          required
-        />
+        <label><i className="fa-solid fa-file-alt"></i> Job Description:</label>
+        <textarea value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} required></textarea>
 
-
-        <label>Job Description:</label>
-        <textarea
-          value={jobDescription}
-          onChange={(e) => setJobDescription(e.target.value)}
-          required
-        ></textarea>
-
-        {/* ✅ New Skills Required Field */}
-       
-        <button type="submit">Post Job</button>
+        <button type="submit"><i className="fa-solid fa-paper-plane"></i> Post Job</button>
       </form>
     </div>
   );

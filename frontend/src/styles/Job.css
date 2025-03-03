@@ -1,5 +1,6 @@
+/* Container Styling */
 .job-container {
-  max-width: 900px;
+  max-width: 1100px;
   margin: 30px auto;
   padding: 20px;
   background: #fff;
@@ -11,6 +12,8 @@
   text-align: center;
   color: #333;
   margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: bold;
 }
 
 .loading-text, .no-jobs {
@@ -19,34 +22,41 @@
   color: #666;
 }
 
+/* Job Listings Grid (3 per row) */
 .job-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Ensures responsiveness */
   gap: 20px;
 }
 
+/* Job Card */
 .job-card {
   display: flex;
+  flex-direction: column;
   align-items: center;
   background: #f9f9f9;
-  padding: 15px;
+  padding: 20px;
   border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
   transition: 0.3s ease-in-out;
+  text-align: center;
 }
 
 .job-card:hover {
-  transform: scale(1.02);
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  transform: translateY(-5px);
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.25);
 }
 
+/* Company Logo */
 .company-logo {
-  width: 70px; /* Adjusted image size */
-  height: 70px;
+  width: 80px;
+  height: 80px;
   object-fit: cover;
-  border-radius: 8px;
-  margin-right: 20px;
+  border-radius: 8px; /* Keeps the logo square */
+  margin-bottom: 15px;
 }
 
+/* Job Info */
 .job-info {
   flex: 1;
 }
@@ -66,6 +76,8 @@
 /* Skills Section */
 .job-skills {
   margin-top: 10px;
+  overflow: hidden;
+  text-align: left;
 }
 
 .skills-list {
@@ -74,15 +86,27 @@
   gap: 8px;
   margin-top: 5px;
   padding: 0;
+  max-width: 100%;
 }
 
 .skill {
-  background: #2575fc;
+  background: #5e78a6;
   color: white;
   padding: 5px 10px;
   border-radius: 5px;
   font-size: 14px;
   list-style: none;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Ensures long lists do not overflow */
+.job-skills {
+  max-height: 80px;
+  overflow-y: auto;
+  padding-right: 5px;
 }
 
 /* Apply Button */

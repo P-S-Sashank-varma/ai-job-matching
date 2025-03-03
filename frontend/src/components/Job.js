@@ -28,21 +28,31 @@ const Job = () => {
 
   return (
     <div className="job-container">
-      <h2>Available Jobs</h2>
+      <h2 className="job-heading">Available Jobs</h2>
       {loading ? (
-        <p>Loading jobs...</p>
+        <p className="loading-text">Loading jobs...</p>
       ) : jobs.length === 0 ? (
-        <p>No jobs available.</p>
+        <p className="no-jobs">No jobs available.</p>
       ) : (
         <div className="job-list">
           {jobs.map((job, index) => (
             <div key={index} className="job-card">
               <img src={job.company_image_url} alt="Company Logo" className="company-logo" />
               <div className="job-info">
-                <h3>{job.company}</h3>
-                <p><strong>Recruiter:</strong> {job.recruiter_name}</p>
-                <p><strong>Posted On:</strong> {new Date().toLocaleString()}</p>
-                <p><strong>Skills Required:</strong> {job.skills_required || "No skills listed"}</p>  {/* ✅ Fix */}
+                <h3 className="company-name">{job.company}</h3>
+                <p className="job-detail"><strong>Recruiter:</strong> {job.recruiter_name}</p>
+                <p className="job-detail"><strong>Posted On:</strong> {new Date().toLocaleString()}</p>
+                
+                {/* Skills Section */}
+                <div className="job-skills">
+                  <strong>Skills Required:</strong>
+                  <ul className="skills-list">
+                    {(job.skills_required || "No skills listed").split(",").map((skill, idx) => (
+                      <li key={idx} className="skill">{skill.trim()}</li>
+                    ))}
+                  </ul>
+                </div>
+                
                 <button className="apply-button">AI will APPLY</button>
               </div>
             </div>

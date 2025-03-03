@@ -1,65 +1,99 @@
 /* HRInterview.css */
 .interview-container {
-    max-width: 600px;
-    margin: auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    text-align: center;
-    background: #f9f9f9;
-  }
-  
-  .title {
-    font-size: 24px;
-    color: #333;
-  }
-  
-  .ai-icon {
-    width: 230px;
-    height: auto;
-    margin: 10px 0;
-  }
-  
-  .question {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px;
-  }
-  
-  .answer-box {
-    width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-  }
-  
-  .next-button {
-    margin-top: 10px;
-    padding: 10px 20px;
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .next-button:hover {
-    background: #0056b3;
-  }
-  
-  .loading, .error {
-    font-size: 16px;
-    color: red;
-  }
-  
-  .completion-text {
-    font-size: 20px;
-    color: green;
-  }
-  
-  .score-text {
-    font-size: 18px;
-    font-weight: bold;
-  }
-  
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  background: linear-gradient(135deg, #f3f4f6, #dbeafe);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+}
+
+.title {
+  font-size: 26px;
+  font-weight: bold;
+  color: #1e3a8a;
+}
+
+.ai-icon {
+  width: 230px;
+  height: auto;
+  margin: 15px 0;
+}
+
+.question {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  color: #111827;
+}
+
+.answer-box {
+  width: 100%;
+  padding: 12px;
+  margin-top: 12px;
+  border-radius: 6px;
+  border: 1px solid #94a3b8;
+  background: #f8fafc;
+  font-size: 16px;
+}
+
+.next-button {
+  margin-top: 12px;
+  padding: 12px 24px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s ease;
+}
+
+.next-button:hover {
+  background: #1e40af;
+}
+
+.loading, .error {
+  font-size: 16px;
+  color: #dc2626;
+}
+
+.completion-text {
+  font-size: 22px;
+  color: #16a34a;
+  font-weight: bold;
+}
+
+.score-text {
+  font-size: 20px;
+  font-weight: bold;
+  color: #4338ca;
+}
+
+.skills-input, .email-input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+  border-radius: 6px;
+  border: 1px solid #94a3b8;
+  background: #ffffff;
+  font-size: 16px;
+}
+
+.fetch-button {
+  margin-top: 12px;
+  padding: 12px 24px;
+  background: #16a34a;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s ease;
+}
+
+.fetch-button:hover {
+  background: #15803d;
+}

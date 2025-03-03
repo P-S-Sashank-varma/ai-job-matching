@@ -28,4 +28,4 @@ class RecruiterDashboardSchema(BaseModel):
     company_image: Optional[bytes] = None  
     company_image_filename: Optional[str] = None  
     job_description: str  
-    skills_required: str  # ✅ New field for required skills
+    skills_required: str  
