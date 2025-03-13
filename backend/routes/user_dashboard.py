@@ -117,10 +117,11 @@ async def get_matching_jobs(email: str):
         matched_skills = user_skills.intersection(job_skills)
         match_percentage = (len(matched_skills) / len(job_skills)) * 100 if job_skills else 0
         
-        if match_percentage >= 80:
+        if match_percentage >= 60:
             selected_jobs.append({
                 "id": str(job["_id"]),
                 "recruiter_name": job["recruiter_name"],
+                "recruiter_email": job["email"],  # ✅ Added Recruiter's Email
                 "company": job["company"],
                 "skills_required": list(job_skills),
                 "matched_skills": list(matched_skills),
@@ -133,7 +134,6 @@ async def get_matching_jobs(email: str):
 
     return selected_jobs
  
-
  
 @router.post("/upload-resume")
 async def upload_resume(

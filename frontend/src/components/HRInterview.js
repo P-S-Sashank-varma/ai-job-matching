@@ -1,17 +1,26 @@
 import React, { useState } from "react";
+import { useParams } from "react-router-dom";
 import emailjs from "@emailjs/browser";
 import "../styles/HRInterview.css";
 import aiImage from "../images/ai-img-icon.png";
+import { useNavigate } from "react-router-dom";
 
-const HRInterview = () => {
+const HRInterview = ({ userName }) => {
+  const { recruiterEmail } = useParams();
+  const decodedRecruiterEmail = recruiterEmail
+    ? decodeURIComponent(recruiterEmail)
+    : "Unknown";
+
+  const navigate = useNavigate();
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState([]);
   const [score, setScore] = useState(null);
   const [evaluating, setEvaluating] = useState(false);
-  const [skills, setSkills] = useState(""); // Input for skills
-  const [loading, setLoading] = useState(false); // Loading state
-  const [candidateEmail, setCandidateEmail] = useState(""); // Candidate's email
+  const [skills, setSkills] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [candidateEmail, setCandidateEmail] = useState("");
+  const [showInterview, setShowInterview] = useState(false);
 
   // Function to fetch questions
   const fetchQuestions = async () => {
@@ -28,7 +37,7 @@ const HRInterview = () => {
       const data = await response.json();
       if (data.questions && Array.isArray(data.questions)) {
         setQuestions(data.questions);
-        setAnswers(new Array(data.questions.length).fill("")); // Initialize empty answers
+        setAnswers(new Array(data.questions.length).fill(""));
       }
     } catch (err) {
       console.error("Error fetching questions:", err);
@@ -87,82 +96,117 @@ const HRInterview = () => {
     }
   };
 
-  // Send email to the candidate
+  // Send interview result to recruiter
   const sendEmail = (finalScore) => {
-    const serviceID = "service_2muq5z7"; // Replace with your EmailJS Service ID
-    const templateID = "template_saz9rem"; // Replace with your EmailJS Template ID
-    const publicKey = "9cF6wTZ08TowYhA2u"; // Replace with your EmailJS Public Key
+    const serviceID = "service_2muq5z7";
+    const templateID = "template_saz9rem";
+    const publicKey = "9cF6wTZ08TowYhA2u";
 
     const templateParams = {
-      to_email: candidateEmail, // ✅ Now dynamically sends to the candidate's email
-      from_name: "HR Team",
-      reply_to: "virushka679@gmail.com", // Change if needed
-      message: `Bhaskar ninna chusina aunty video in the AI HR interview, scoring ${finalScore}/10. Based on this evaluation, they appear to be a strong candidate for further consideration. This assessment was conducted through the AI Job Matching Portal, ensuring an efficient and unbiased evaluation process.`,
+      to_email: decodedRecruiterEmail,
+      from_name: "Smart Hire AI",
+      reply_to: "virushka679@gmail.com",
+      message: `The candidate has completed the AI HR interview with a score of ${finalScore}/10.\n\nCandidate Email: ${candidateEmail}\n\nThis assessment was conducted through the AI Job Matching Portal, ensuring an efficient and unbiased evaluation process.`,
     };
 
     emailjs
       .send(serviceID, templateID, templateParams, publicKey)
       .then((response) => {
-        console.log("Email sent successfully!", response);
+        console.log("✅ Email sent successfully!", response);
       })
       .catch((error) => {
-        console.error("Error sending email:", error);
+        console.error("❌ Error sending email:", error);
       });
   };
 
   return (
     <div className="interview-container">
-      <h2 className="title">AI-Generated HR Interview</h2>
+      <h2 className="title">AI Hiring Process</h2>
       <img src={aiImage} alt="AI Icon" className="ai-icon" />
+      <p>
+        <strong>Recruiter Email:</strong> {decodedRecruiterEmail}
+      </p>
 
-      {score === null ? (
+      <div className="rounds-container">
+  <button className="round-button" onClick={() => navigate("/Aptitude")}>
+    Round 1: Aptitude
+  </button>
+  <button className="round-button" onClick={() => navigate("/codinground")}>
+    Round 2: Coding
+  </button>
+  <button className="round-button" onClick={() => setShowInterview(true)}>
+    Round 3: AI HR Interview
+  </button>
+</div>
+
+
+      {showInterview && (
         <>
-          {!questions.length ? (
+          {score === null ? (
             <>
-              <p className="instruction">Enter your skills and email to generate interview questions:</p>
-              <input
-                type="text"
-                value={skills}
-                onChange={(e) => setSkills(e.target.value)}
-                placeholder="e.g., Python, React, Machine Learning"
-                className="skills-input"
-              />
-              <input
-                type="email"
-                value={candidateEmail}
-                onChange={(e) => setCandidateEmail(e.target.value)}
-                placeholder="Enter Candidate's Email"
-                className="email-input"
-              />
-              <button onClick={fetchQuestions} className="fetch-button" disabled={loading}>
-                {loading ? "Loading..." : "Generate Questions"}
-              </button>
+              {!questions.length ? (
+                <>
+                  <p className="instruction">
+                    Enter your skills and email to generate interview questions:
+                  </p>
+                  <input
+                    type="text"
+                    value={skills}
+                    onChange={(e) => setSkills(e.target.value)}
+                    placeholder="e.g., Python, React, Machine Learning"
+                    className="skills-input"
+                  />
+                  <input
+                    type="email"
+                    value={candidateEmail}
+                    onChange={(e) => setCandidateEmail(e.target.value)}
+                    placeholder="Enter Candidate's Email"
+                    className="email-input"
+                  />
+                  <button
+                    onClick={fetchQuestions}
+                    className="fetch-button"
+                    disabled={loading}
+                  >
+                    {loading ? "Loading..." : "Generate Questions"}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="question">
+                    <strong>Question {currentQuestionIndex + 1}:</strong>{" "}
+                    {questions[currentQuestionIndex]}
+                  </p>
+                  <textarea
+                    rows="3"
+                    value={answers[currentQuestionIndex] || ""}
+                    onChange={handleAnswerChange}
+                    placeholder="Type your answer here..."
+                    className="answer-box"
+                  />
+                  <button
+                    onClick={handleNextQuestion}
+                    className="next-button"
+                    disabled={evaluating}
+                  >
+                    {currentQuestionIndex < questions.length - 1
+                      ? "Next"
+                      : "Finish"}
+                  </button>
+                </>
+              )}
             </>
           ) : (
             <>
-              <p className="question">
-                <strong>Question {currentQuestionIndex + 1}:</strong> {questions[currentQuestionIndex]}
-              </p>
-              <textarea
-                rows="3"
-                value={answers[currentQuestionIndex] || ""}
-                onChange={handleAnswerChange}
-                placeholder="Type your answer here..."
-                className="answer-box"
-              />
-              <button onClick={handleNextQuestion} className="next-button" disabled={evaluating}>
-                {currentQuestionIndex < questions.length - 1 ? "Next" : "Finish"}
-              </button>
+              <h3 className="completion-text">Interview Completed!</h3>
+              {evaluating ? (
+                <p className="score-text">Evaluating your answers...</p>
+              ) : (
+                <p className="score-text">
+                  Your Score: <strong>{score}/10</strong>
+                </p>
+              )}
             </>
-          )}
-        </>
-      ) : (
-        <>
-          <h3 className="completion-text">Interview Completed!</h3>
-          {evaluating ? (
-            <p className="score-text">Evaluating your answers...</p>
-          ) : (
-            <p className="score-text">Your Score: <strong>{score}/10</strong></p>
           )}
         </>
       )}

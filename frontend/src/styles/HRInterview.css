@@ -97,3 +97,60 @@
 .fetch-button:hover {
   background: #15803d;
 }
+
+.pre-test-buttons {
+  margin-top: 20px;
+  display: flex;
+  gap: 15px;
+}
+
+.aptitude-button, .coding-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: 0.3s;
+}
+
+.aptitude-button {
+  background-color: #ff9800;
+  color: white;
+  margin: left 20px;
+  
+}
+
+.coding-button {
+  background-color: #2196f3;
+  color: white;
+}
+
+.aptitude-button:hover {
+  background-color: #e68900;
+}
+
+.coding-button:hover {
+  background-color: #1976d2;
+}
+
+.rounds-container {
+  display: flex;
+  gap: 15px; /* Adds spacing between buttons */
+  justify-content: center; /* Centers buttons */
+  margin-bottom: 20px; /* Adds some spacing below */
+}
+
+.round-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background 0.3s ease;
+}
+
+.round-button:hover {
+  background-color: #0056b3;
+}

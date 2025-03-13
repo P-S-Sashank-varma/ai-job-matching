@@ -15,10 +15,10 @@ os.makedirs(RESUME_DIR, exist_ok=True)  # Ensure directory exists
 # ✅ Define Skills List - Unchanged
 SKILL_SET = {
     "html", "css", "javascript", "react", "angular", "flask", "nodejs", "expressjs",
-    "mongodb", "sql", "mysql", "c", "c++", "java", "python", "r", "c#", "php",
+    "mongodb", "sql", "mysql", "c", "c++", "java", "python", "r language", "c#", "php",
     "go", "machine learning", "ai", "dl", "deep learning", "nlp", "aws", "mean",
-    "mern", "powerbi", "devops", "linux", "cyber security", "tableau", "iot",
-    "data analytics", "dsa", "data structures and algorithms"
+    "mern", "Power Bi", "devops", "linux", "cyber security", "tableau", "iot",
+    "data analytics", "dsa", "data structures and algorithms","Excel"
 }
 
 # ✅ Function to Extract Text from PDF - Unchanged

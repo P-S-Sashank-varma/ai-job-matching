@@ -67,7 +67,7 @@ function UserPortal() {
   return (
     <div className="user-portal">
       <nav className="navbar">
-        <div className="logo">AI Job Portal</div>
+        <div className="logo">Smart Hire AI</div>
         <ul className="nav-links">
           <li><a href="/">Home</a></li>
           <li><a href="/contact">Contact</a></li>

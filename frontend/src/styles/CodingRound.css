@@ -1,0 +1,116 @@
+/* Modern UI Styles for Coding Round */
+
+#coding-round-page {
+  font-family: 'Poppins', sans-serif;
+  background-color: #1e1e2f;
+  color: #ffffff;
+  margin: 0;
+  padding: 0;
+}
+
+.coding-round-container {
+  max-width: 900px;
+  margin: 40px auto;
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+}
+
+.coding-round-container h2, 
+.coding-round-container h3 {
+  text-align: center;
+  color: #00f014;
+}
+
+.coding-round-time-left {
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  background: #1388a3;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.coding-round-language-select {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.coding-round-language-select select {
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: none;
+  background: #3a3a4f;
+  color: #ffffff;
+}
+
+.coding-round-test-cases-table, 
+.coding-round-failed-cases-table, 
+.coding-round-test-results-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.coding-round-test-cases-table th, 
+.coding-round-test-cases-table td,
+.coding-round-failed-cases-table th, 
+.coding-round-failed-cases-table td,
+.coding-round-test-results-table th, 
+.coding-round-test-results-table td {
+  border: 1px solid #444;
+  padding: 10px;
+  text-align: center;
+}
+
+.coding-round-test-cases-table th, 
+.coding-round-failed-cases-table th, 
+.coding-round-test-results-table th {
+  background: #44475a;
+}
+
+.coding-round-container button {
+  display: block;
+  width: 30%;
+  padding: 12px;
+  margin-top: 15px;
+  font-size: 16px;
+  font-weight: bold;
+  background: #f0f000;
+  border: none;
+  border-radius: 6px;
+  color: #1e1e2f;
+  cursor: pointer;
+  align-content: center;
+  transition: 0.3s ease-in-out;
+}
+
+.coding-round-container button:hover {
+  background: #ff4f5a;
+  color: #ffffff;
+}
+
+.coding-round-editor-container {
+  margin-top: 20px;
+  background: #282a36;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.coding-round-result-section {
+  margin-top: 20px;
+  text-align: center;
+  padding: 15px;
+  background:whitesmoke;
+  border-radius: 8px;
+}
+
+.coding-round-completion-section {
+  text-align: center;
+  padding: 20px;
+  background: #44475a;
+  border-radius: 8px;
+  margin-top: 20px;
+}

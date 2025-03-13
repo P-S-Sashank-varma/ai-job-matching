@@ -23,14 +23,14 @@ app.add_middleware(
 )
 
 # ✅ Import and Include Routers
-from routes import auth, recruiter_dashboard, user_dashboard, resume_parser, matching_jobs
+from routes import auth, recruiter_dashboard, user_dashboard, resume_parser, matching_jobs,execute_code
 
 app.include_router(auth.router)
 app.include_router(recruiter_dashboard.router)
 app.include_router(user_dashboard.router)
 app.include_router(resume_parser.router)
 app.include_router(matching_jobs.router)
-
+app.include_router(execute_code.router)
 # ✅ Groq API Configuration
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions"

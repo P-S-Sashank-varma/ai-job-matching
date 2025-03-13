@@ -1,96 +1,113 @@
-/* ✅ Container */
-.selected-jobs-container {
+.recruiter-dashboard {
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
   text-align: center;
-  padding: 40px;
-  background-color: #f8f9fa;
-}
-
-/* ✅ Job List */
-.selected-jobs-list {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 25px;
-  max-width: 1200px;
-  margin: auto;
-}
-
-/* ✅ Job Card */
-.job-card {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
-  padding: 20px;
-  width: 320px;  /* Fixed width */
-  text-align: center;
+  font-family: 'Poppins', sans-serif;
   transition: all 0.3s ease-in-out;
-  border: 1px solid #e0e0e0;
+}
+
+.recruiter-dashboard:hover {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.recruiter-dashboard h2 {
+  color: #2f9396;
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+form {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 18px;
 }
 
-/* Hover Effect */
-.job-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
-}
-
-/* ✅ Company Logo */
-.company-logo {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  margin-bottom: 15px;
-  border: 3px solid #ddd;
-  object-fit: cover;
-}
-
-/* ✅ Job Info */
-.job-info {
-  flex-grow: 1;
-  width: 100%;
-}
-
-.job-info h3 {
-  color: #222;
-  font-size: 20px;
-  margin-bottom: 8px;
-}
-
-.job-info p {
-  font-size: 14px;
-  color: #666;
-  margin: 6px 0;
-  line-height: 1.5;
-}
-
-/* ✅ Match Percentage */
-.match-percentage {
+label {
+  font-weight: 800;
+  text-align: left;
+  color: #9e4413c1;
   font-size: 16px;
-  font-weight: bold;
-  color: #28a745;
-  margin-top: 8px;
 }
 
-/* ✅ Apply Button */
-.apply-button {
-  background-color: #2575fc;
+input,
+textarea {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #6bae41;
+  border-radius: 10px;
+  font-size: 16px;
+  transition: all 0.3s ease-in-out;
+  background: whitesmoke;
+}
+
+input:focus,
+textarea:focus {
+  border-color: #3498db;
+  outline: none;
+  box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
+  background: #ffffff;
+}
+
+textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.file-upload {
+  background: #f8f9fa;
+  padding: 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  border: 1px dashed #3498db;
+  text-align: center;
+  transition: all 0.3s ease-in-out;
+  font-weight: 500;
+  color: #3498db;
+}
+
+.file-upload:hover {
+  background: #e9f5ff;
+  color: #2c3e50;
+}
+
+button {
+  margin-top: 20px;
+  padding: 14px;
+  background: linear-gradient(135deg, #1abc9c, #16a085);
   color: white;
   border: none;
-  padding: 12px;
-  width: 100%;
-  max-width: 280px;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
-  margin-top: 15px;
-  align-self: center;
+  letter-spacing: 0.5px;
 }
 
-.apply-button:hover {
-  background-color: #1a5bb6;
-  transform: scale(1.05);
+button:hover {
+  background: linear-gradient(135deg, #16a085, #1abc9c);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(26, 188, 156, 0.4);
+}
+
+@media (max-width: 768px) {
+  .recruiter-dashboard {
+    width: 90%;
+    padding: 25px;
+  }
+
+  input,
+  textarea {
+    font-size: 15px;
+  }
+
+  button {
+    font-size: 16px;
+  }
 }

@@ -1,0 +1,143 @@
+/* Aptitude.css */
+
+.aptitude-container {
+  font-family: 'Poppins', sans-serif;
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+  text-align: center;
+  background: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.exam-header {
+  background: #007bff;
+  color: white;
+  padding: 15px;
+  border-radius: 10px 10px 0 0;
+  font-size: 24px;
+}
+
+.timer {
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.warning {
+  color: red;
+}
+
+.exam-content {
+  padding: 20px;
+}
+
+.question-container {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+.progress {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.question-text {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.options-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 15px;
+}
+
+.option-item {
+  margin-bottom: 10px;
+}
+
+.option-label {
+  font-size: 14px;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.button-container {
+  margin-top: 20px;
+}
+
+.submit-button {
+  background: #007bff;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+.submit-button:disabled {
+  background: gray;
+  cursor: not-allowed;
+}
+
+.submit-button:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.result-container {
+  margin-top: 20px;
+  padding: 20px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.score {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.percentage {
+  font-size: 18px;
+  color: #007bff;
+}
+
+.result-message {
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.success {
+  color: green;
+}
+
+.fail {
+  color: red;
+}
+
+.exit-button {
+  background: red;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+.exit-button:hover {
+  background: darkred;
+}

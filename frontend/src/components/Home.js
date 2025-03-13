@@ -4,36 +4,39 @@ import aiParserImage from "../images/job.png"; // Job Match
 import resumeParserImage from "../images/ai-parser.png"; // Resume Parser
 import aiInterviewImage from "../images/ai-interview.png"; // AI Interview
 import professionalResumeImage from "../images/job.png"; // Professional Resume Writing
-import dev1Image from "../images/profile-pic.png";
+import dev1Image from "../images/pf2.jpeg";
 import dev2Image from "../images/kumar.png";
 import dev3Image from "../images/mani4.jpeg";
 import dev4Image from "../images/bhaskar.png";
 import { FaLinkedin, FaGithub, FaEnvelope, FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
-
+import logo from "../images/ss2.png"
 function Home() {
   return (
     <>
-      {/* Home Page Section */}
-      <div className="home-page">
-        <nav className="navbar">
-          <div className="logo">AI Job Portal</div>
-          <ul className="nav-links">
-            <li><a href="/recruiter-dashboard">Home</a></li>
-            <li><a href="/jobs">Jobs</a></li>
-            <li><a href="/login">Login</a></li>
-            <li><a href="/signup">Signup</a></li>
-            <li><a href="/contact">Contact</a></li>
-          </ul>
-        </nav>
+{/* Home Page Section */}
+<div className="home-page">
+  <nav className="navbar">
+    <div className="logo">
+      <img src={logo} alt="AI Job Portal Logo" className="logo-image" />
+    </div>
+    <ul className="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/jobs">Jobs</a></li>
+      <li><a href="/login">Login</a></li>
+      <li><a href="/signup">Signup</a></li>
+      <li><a href="/contact">Contact</a></li>
+    </ul>
+  </nav>
 
-        <div className="content">
-          <h1>Welcome to the AI Job Matching Portal</h1>
-          <p>Find jobs that match your skills and let AI apply for them on your behalf.</p>
-          <a href="/login">
-            <button className="cta-button">Get Started</button>
-          </a>
-        </div>
-      </div>
+  <div className="content">
+    <h1>Welcome to the AI Job Matching Portal</h1>
+    <p>Find jobs that match your skills and let AI apply for them on your behalf.</p>
+    <a href="/login">
+      <button className="cta-button">Get Started</button>
+    </a>
+  </div>
+</div>
+
 
       {/* Features Section */}
       <div className="features-section" id="features">
@@ -72,10 +75,9 @@ function Home() {
     <ul>
       <li>Upload your resume for AI parsing</li>
       <li>Extracted skills matched with job opportunities</li>
-      <li>AI-generated HR interview questions based on your profile</li>
-      <li>Receive feedback to improve your interview performance</li>
+      <li>Assess your expertise in aptitude, coding skills, and AI interview preparation</li>
     </ul>
-    <button className="cta-button">Start AI HR Interview</button>
+    <button className="cta-button">Start AI Interview</button>
   </div>
   <img
     src={professionalResumeImage}  // Keep the same image reference
