@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Editor from "@monaco-editor/react";
 import axios from "axios";
 import "../styles/CodingRound.css";
-
+import WebcamCapture from "./WebcamCapture";//
 // ✅ Question Bank (5 Questions)
 const questionBank = [
   { id: 1, title: "Sum of Two Numbers", description: "Write a function that takes two integers and returns their sum.", testCases: [ { input: "2 3", expectedOutput: "5" }, { input: "10 15", expectedOutput: "25" }, { input: "0 0", expectedOutput: "0" } ], language: "python" },

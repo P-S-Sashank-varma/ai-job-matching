@@ -1,113 +1,81 @@
-.recruiter-dashboard {
-  max-width: 600px;
-  margin: 50px auto;
-  padding: 30px;
-  background: #ffffff;
-  border-radius: 15px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+.selected-jobs-container {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   text-align: center;
-  font-family: 'Poppins', sans-serif;
-  transition: all 0.3s ease-in-out;
 }
 
-.recruiter-dashboard:hover {
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-}
-
-.recruiter-dashboard h2 {
-  color: #2f9396;
-  font-size: 28px;
-  font-weight: 600;
+h2 {
+  color: #333;
   margin-bottom: 20px;
-  letter-spacing: 1px;
 }
 
-form {
+.job-list {
   display: flex;
-  flex-direction: column;
-  gap: 18px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
 }
 
-label {
-  font-weight: 800;
+.job-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 600px;
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+}
+
+.job-card:hover {
+  transform: translateY(-5px);
+}
+
+.company-logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: contain;
+  margin-right: 15px;
+}
+
+.job-info {
+  flex: 1;
   text-align: left;
-  color: #9e4413c1;
-  font-size: 16px;
 }
 
-input,
-textarea {
-  width: 100%;
-  padding: 14px;
-  border: 1px solid #6bae41;
-  border-radius: 10px;
-  font-size: 16px;
-  transition: all 0.3s ease-in-out;
-  background: whitesmoke;
+.job-info h3 {
+  color: #0073e6;
+  margin-bottom: 5px;
 }
 
-input:focus,
-textarea:focus {
-  border-color: #3498db;
-  outline: none;
-  box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
-  background: #ffffff;
+.job-info p {
+  font-size: 14px;
+  color: #555;
+  margin: 3px 0;
 }
 
-textarea {
-  min-height: 120px;
-  resize: vertical;
-}
-
-.file-upload {
-  background: #f8f9fa;
-  padding: 14px;
-  border-radius: 10px;
-  cursor: pointer;
-  border: 1px dashed #3498db;
-  text-align: center;
-  transition: all 0.3s ease-in-out;
-  font-weight: 500;
-  color: #3498db;
-}
-
-.file-upload:hover {
-  background: #e9f5ff;
-  color: #2c3e50;
+.job-info strong {
+  color: #333;
 }
 
 button {
-  margin-top: 20px;
-  padding: 14px;
-  background: linear-gradient(135deg, #1abc9c, #16a085);
+  margin-top: 10px;
+  padding: 8px 12px;
+  font-size: 14px;
   color: white;
+  background-color: #0073e6;
   border: none;
-  border-radius: 10px;
-  font-size: 18px;
-  font-weight: bold;
+  border-radius: 5px;
   cursor: pointer;
-  transition: all 0.3s ease-in-out;
-  letter-spacing: 0.5px;
+  transition: background 0.3s ease-in-out;
 }
 
 button:hover {
-  background: linear-gradient(135deg, #16a085, #1abc9c);
-  transform: translateY(-3px);
-  box-shadow: 0 4px 10px rgba(26, 188, 156, 0.4);
-}
-
-@media (max-width: 768px) {
-  .recruiter-dashboard {
-    width: 90%;
-    padding: 25px;
-  }
-
-  input,
-  textarea {
-    font-size: 15px;
-  }
-
-  button {
-    font-size: 16px;
-  }
+  background-color: #005bb5;
 }

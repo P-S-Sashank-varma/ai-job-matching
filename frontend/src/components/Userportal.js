@@ -1,7 +1,25 @@
+
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { 
+  User, 
+  FileText, 
+  Briefcase, 
+  CheckCircle, 
+  Calendar
+} from "lucide-react";
 import "../styles/Userportal.css";
-import { FaUserCircle } from "react-icons/fa";
+import { 
+  renderResumeTab, 
+  renderJobsTab, 
+  renderApplicationsTab, 
+  renderDrivesTab 
+} from "./UserPortalTabs";
+import { 
+  checkExistingResume, 
+  fetchSelectedJobs, 
+  setupDrivesData 
+} from "./UserPortalAPI";
 
 function UserPortal() {
   const [name, setName] = useState("");
@@ -9,94 +27,138 @@ function UserPortal() {
   const [phone, setPhone] = useState("");
   const [resumeFile, setResumeFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [hasExistingResume, setHasExistingResume] = useState(false);
+  const [selectedJobs, setSelectedJobs] = useState([]);
+  const [upcomingDrives, setUpcomingDrives] = useState([]);
+  const [activeTab, setActiveTab] = useState("jobs"); // "resume", "jobs", "applications", "drives"
 
   const resumeInputRef = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      const decodedToken = JSON.parse(atob(token.split(".")[1]));
-      setEmail(decodedToken.email);
-    }
-  }, []);
+      try {
+        const decodedToken = JSON.parse(atob(token.split(".")[1]));
+        setEmail(decodedToken.email);
+        
+        checkExistingResume(decodedToken.email, setHasExistingResume, setName, setPhone, activeTab, location);
+        
+        if (location.pathname === '/selected-jobs') {
+          setActiveTab('jobs');
+        } else if (location.pathname === '/drives') {
+          setActiveTab('drives');
+        }
+        
+        if (activeTab === "jobs" || location.pathname === '/selected-jobs') {
+          fetchSelectedJobs(decodedToken.email, setSelectedJobs);
+        }
 
-  const handleResumeUpload = async (event) => {
-    event.preventDefault();
-    if (!resumeFile) {
-      alert("Please select a resume file before submitting.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("email", email);
-    formData.append("phone", phone);
-    formData.append("resume", resumeFile);
-
-    try {
-      setLoading(true);
-      const uploadResponse = await fetch("http://127.0.0.1:8000/upload-resume", {
-        method: "POST",
-        body: formData,
-      });
-
-      const uploadResult = await uploadResponse.json();
-      if (!uploadResponse.ok) {
-        throw new Error(uploadResult.detail || "Error uploading resume");
+        setupDrivesData(setUpcomingDrives);
+      } catch (error) {
+        console.error("Error parsing token:", error);
+      
       }
-
-      alert("Resume uploaded successfully!");
-      await fetch(`http://127.0.0.1:8000/parse-resume/${email}`);
-      navigate("/selected-jobs");
-
-      setName("");
-      setPhone("");
-      setResumeFile(null);
-      if (resumeInputRef.current) {
-        resumeInputRef.current.value = "";
-      }
-    } catch (error) {
-      console.error("Error processing resume:", error);
-      alert("Failed to process resume. Please try again.");
-    } finally {
-      setLoading(false);
+    } else {
+      setEmail("user@example.com");
+      checkExistingResume("user@example.com", setHasExistingResume, setName, setPhone, activeTab, location);
+      setupDrivesData(setUpcomingDrives);
     }
+  }, [activeTab, location.pathname]);
+
+  const tabProps = {
+    name, setName,
+    email,
+    phone, setPhone,
+    resumeFile, setResumeFile,
+    loading, setLoading,
+    hasExistingResume, setHasExistingResume,
+    selectedJobs, setSelectedJobs,
+    upcomingDrives, setUpcomingDrives,
+    setActiveTab,
+    navigate,
+    resumeInputRef,
+    location,
   };
 
   return (
     <div className="user-portal">
       <nav className="navbar">
         <div className="logo">Smart Hire AI</div>
+        
         <ul className="nav-links">
           <li><a href="/">Home</a></li>
           <li><a href="/contact">Contact</a></li>
         </ul>
+        
         <div className="user-info">
-          <FaUserCircle className="user-icon" />
+          <div className="user-icon">
+            <User size={16} />
+          </div>
           <span className="username">{email || "User"}</span>
         </div>
       </nav>
 
-      <div className="resume-section">
-        <h2>Upload Your Resume</h2>
-        <form className="resume-form" onSubmit={handleResumeUpload}>
-          <label>Full Name:</label>
-          <input type="text" placeholder="Enter your name" value={name} onChange={(e) => setName(e.target.value)} required />
+      <div className="main-container">
+        <div className="sidebar">
+          <div className="sidebar-nav">
+            <button
+              onClick={() => {
+                setActiveTab("resume");
+              }}
+              className={`sidebar-link ${activeTab === "resume" ? "active" : ""}`}
+            >
+              <FileText size={18} />
+              <span>Resume</span>
+            </button>
+            
+            <button
+              onClick={() => {
+                setActiveTab("jobs");
+              }}
+              className={`sidebar-link ${activeTab === "jobs" ? "active" : ""}`}
+            >
+              <Briefcase size={18} />
+              <span>Selected Jobs</span>
+            </button>
+            
+            <button
+              onClick={() => setActiveTab("applications")}
+              className={`sidebar-link ${activeTab === "applications" ? "active" : ""}`}
+            >
+              <CheckCircle size={18} />
+              <span>Applications</span>
+            </button>
 
-          <label>Email:</label>
-          <input type="email" value={email} disabled required />
-
-          <label>Phone Number:</label>
-          <input type="tel" placeholder="Enter phone number" value={phone} onChange={(e) => setPhone(e.target.value)} required />
-
-          <label>Upload Resume:</label>
-          <input type="file" accept=".pdf,.doc,.docx" onChange={(e) => setResumeFile(e.target.files[0])} ref={resumeInputRef} required />
-
-          <button type="submit" className="upload-btn" disabled={loading}>
-            {loading ? "Processing..." : "Submit"}
-          </button>
-        </form>
+            <button
+              onClick={() => {
+                setActiveTab("drives");
+              }}
+              className={`sidebar-link ${activeTab === "drives" ? "active" : ""}`}
+            >
+              <Calendar size={18} />
+              <span>Hiring Drives</span>
+            </button>
+          </div>
+          
+          <div className="resume-status">
+            <h4 className="font-medium">Resume Status</h4>
+            <div className="status-indicator">
+              <div className={`status-dot ${hasExistingResume ? 'active' : 'pending'}`}></div>
+              <span>
+                {hasExistingResume ? 'Resume uploaded' : 'No resume uploaded'}
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="content-area">
+          {activeTab === "resume" && renderResumeTab(tabProps)}
+          {activeTab === "jobs" && renderJobsTab(tabProps)}
+          {activeTab === "applications" && renderApplicationsTab(tabProps)}
+          {activeTab === "drives" && renderDrivesTab(tabProps)}
+        </div>
       </div>
     </div>
   );

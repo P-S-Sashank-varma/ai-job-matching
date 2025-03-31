@@ -58,19 +58,16 @@ async def get_user_dashboard(email: str):
         "resume_url": f"http://127.0.0.1:8000/get-resume/{user['resume_filename']}"
     }
 
-# **🔹 API: Get Resume File**
+
 @router.get("/get-resume/{filename}")
-async def get_resume(filename: str):
+async def get_resume_by_filename(filename: str):
     file_path = os.path.join(UPLOAD_DIR, filename)
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="Resume not found")
     return FileResponse(file_path, media_type="application/pdf", filename=filename)
 
-
-
-
-@router.get("/get-resume/{email}")
-async def get_resume(email: str):
+@router.get("/get-resume-by-email/{email}")  # Changed route name
+async def get_resume_by_email(email: str):
     user = await user_dashboard_collection.find_one({"email": email})
 
     if not user:
@@ -80,16 +77,16 @@ async def get_resume(email: str):
     if not resume_filename:
         raise HTTPException(status_code=404, detail="Resume not found for this user")
 
-    # ✅ Fix: Ensure correct absolute path
-    file_path = os.path.join(RESUME_DIR, resume_filename)
-    file_path = os.path.abspath(file_path)  # Convert to absolute path
-
+    file_path = os.path.abspath(os.path.join(UPLOAD_DIR, resume_filename))
+    
+    print(f"User found: {user}")  # Debugging
+    print(f"Resume filename retrieved: {resume_filename}")  # Debugging
+    print(f"Resolved file path: {file_path}")  # Debugging
+    
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail=f"Resume file not found at {file_path}")
 
     return FileResponse(file_path, media_type="application/pdf", filename=resume_filename)
-
-
 
 async def get_user_skills(email):
     """Fetch skills from the logged-in user's resume."""
@@ -134,6 +131,26 @@ async def get_matching_jobs(email: str):
 
     return selected_jobs
  
+@router.get("/check-resume/{email}")
+async def check_resume(email: str):
+    user = await user_dashboard_collection.find_one({"email": email})  # Await the async call
+
+    if user and "resume_path" in user:
+        # Check if the file actually exists
+        resume_path = user["resume_path"]
+        if os.path.exists(resume_path):
+            return {
+                "hasResume": True,
+                "name": user.get("name", ""),
+                "phone": user.get("phone", "")
+            }
+        else:
+            print(f"Resume file not found at path: {resume_path}")  # Debugging
+            return {"hasResume": False, "error": "Resume file not found on server"}
+
+    return {"hasResume": False}
+
+
  
 @router.post("/upload-resume")
 async def upload_resume(

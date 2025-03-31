@@ -1,89 +1,234 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { toast } from "sonner";
 import "../styles/RecruiterDashboard.css";
+import { PostJobTab } from "./RecruiterDashboardTabs/PostJobTab";
+import { PostedJobsTab } from "./RecruiterDashboardTabs/PostedJobsTab";
+import { ConductDriveTab } from "./RecruiterDashboardTabs/ConductDriveTab";
+import { 
+  fetchJobs, 
+  fetchDrives, 
+  handleCompanyImageUpload, 
+  handleEditJob, 
+  handleDeleteJob, 
+  handleDeleteDrive, 
+  handleJobSubmit,
+  handleDriveSubmit
+} from "./RecruiterDashboardAPI";
 
 function RecruiterDashboard() {
+  // State variables
   const [recruiterName, setRecruiterName] = useState("");
   const [email, setEmail] = useState("");
   const [company, setCompany] = useState("");
   const [companyImage, setCompanyImage] = useState(null);
+  const [companyImagePreview, setCompanyImagePreview] = useState(null);
   const [jobDescription, setJobDescription] = useState("");
   const [skillsRequired, setSkillsRequired] = useState("");
+  const [salaryRange, setSalaryRange] = useState("");
+  const [jobLocation, setJobLocation] = useState("Remote");
+  const [location, setLocation] = useState("");
+  const [Matchingpercentage, setMatchingpercentage] = useState("");
+  const [postedJobs, setPostedJobs] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [editingJobId, setEditingJobId] = useState(null);
+  const [activeTab, setActiveTab] = useState("post-job");
+  
+  // Drive section state
+  const [driveName, setDriveName] = useState("");
+  const [driveDate, setDriveDate] = useState("");
+  const [driveTime, setDriveTime] = useState("");
+  const [driveLocation, setDriveLocation] = useState("");
+  const [driveDescription, setDriveDescription] = useState("");
+  const [driveCapacity, setDriveCapacity] = useState("");
+  const [drives, setDrives] = useState([]);
+  const [loadingDrives, setLoadingDrives] = useState(false);
 
   const companyImageInputRef = useRef(null);
 
-  const handleCompanyImageUpload = (event) => {
-    setCompanyImage(event.target.files[0]);
+  useEffect(() => {
+    fetchJobs(email, setPostedJobs, setLoading);
+    fetchDrives(email, setDrives, setLoadingDrives);
+  }, [email]);
+
+  // Reset form for job posting
+  const resetForm = () => {
+    setCompany("");
+    setJobDescription("");
+    setSkillsRequired("");
+    setSalaryRange("");
+    setJobLocation("Remote");
+    setLocation("");
+    setCompanyImage(null);
+    setMatchingpercentage("");
+    setCompanyImagePreview(null);
+    if (companyImageInputRef.current) companyImageInputRef.current.value = "";
+    setEditingJobId(null);
+  };
+  
+  // Reset form for drive submission
+  const resetDriveForm = () => {
+    setDriveName("");
+    setDriveDate("");
+    setDriveTime("");
+    setDriveLocation("");
+    setDriveDescription("");
+    setDriveCapacity("");
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Event handlers with state reference passing
+  const handleCompanyImageChange = (event) => {
+    handleCompanyImageUpload(event, setCompanyImage, setCompanyImagePreview);
+  };
 
-    if (!companyImage) {
-      alert("Please select a company image before submitting.");
-      return;
-    }
+  const handleJobEdit = (job) => {
+    handleEditJob(
+      job, 
+      setEditingJobId, 
+      setCompany, 
+      setJobDescription, 
+      setSkillsRequired, 
+      setSalaryRange, 
+      setJobLocation, 
+      setLocation, 
+      setCompanyImagePreview, 
+      setMatchingpercentage, 
+      setActiveTab
+    );
+  };
 
-    const formData = new FormData();
-    formData.append("recruiter_name", recruiterName);
-    formData.append("email", email);
-    formData.append("company", company);
-    formData.append("job_description", jobDescription);
-    formData.append("skills_required", skillsRequired);
-    formData.append("company_image", companyImage);
+  const handleJobDelete = (jobId) => {
+    handleDeleteJob(jobId, setPostedJobs);
+  };
 
-    try {
-      const response = await fetch("http://127.0.0.1:8000/recruiter-dashboard", {
-        method: "POST",
-        body: formData,
-      });
+  const handleDriveDelete = (driveId) => {
+    handleDeleteDrive(driveId, setDrives);
+  };
 
-      const result = await response.json();
-      if (response.ok) {
-        alert("Job posted successfully!");
+  const submitJobForm = (e) => {
+    handleJobSubmit(
+      e,
+      editingJobId,
+      recruiterName,
+      email,
+      company,
+      jobDescription,
+      skillsRequired,
+      salaryRange,
+      Matchingpercentage,
+      jobLocation,
+      location,
+      companyImage,
+      companyImagePreview,
+      setPostedJobs,
+      resetForm
+    );
+  };
 
-        if (companyImageInputRef.current) {
-          companyImageInputRef.current.value = "";
-        }
-
-        setRecruiterName("");
-        setEmail("");
-        setCompany("");
-        setJobDescription("");
-        setSkillsRequired("");
-        setCompanyImage(null);
-      } else {
-        alert(`Error: ${result.detail}`);
-      }
-    } catch (error) {
-      console.error("Error posting job:", error);
-      alert("Failed to post job. Please try again.");
-    }
+  const submitDriveForm = (e) => {
+    handleDriveSubmit(
+      e,
+      driveName,
+      driveDate,
+      driveTime,
+      driveLocation,
+      driveDescription,
+      driveCapacity,
+      email,
+      recruiterName,
+      setDrives,
+      resetDriveForm
+    );
   };
 
   return (
     <div className="recruiter-dashboard">
-      <h2><i className="fa-solid fa-briefcase"></i> Recruiter Dashboard</h2>
-      <form onSubmit={handleSubmit}>
-        <label><i className="fa-solid fa-user"></i> Recruiter Name:</label>
-        <input type="text" value={recruiterName} onChange={(e) => setRecruiterName(e.target.value)} required />
+      <div className="dashboard-header">
+        <span className="dashboard-tag">Recruiter Portal</span>
+        <h1>Welcome, {recruiterName}</h1>
+        <p>Manage your job postings and recruitment drives all in one place.</p>
+      </div>
 
-        <label><i className="fa-solid fa-envelope"></i> Email:</label>
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+      <div className="tabs">
+        <div 
+          className={`tab ${activeTab === "post-job" ? "active" : ""}`}
+          onClick={() => setActiveTab("post-job")}
+        >
+          {editingJobId ? "Edit Job" : "Post a New Job"}
+        </div>
+        <div 
+          className={`tab ${activeTab === "posted-jobs" ? "active" : ""}`}
+          onClick={() => setActiveTab("posted-jobs")}
+        >
+          Posted Jobs
+        </div>
+        <div 
+          className={`tab ${activeTab === "conduct-drive" ? "active" : ""}`}
+          onClick={() => setActiveTab("conduct-drive")}
+        >
+          Conduct a Drive
+        </div>
+      </div>
 
-        <label><i className="fa-solid fa-building"></i> Company Name:</label>
-        <input type="text" value={company} onChange={(e) => setCompany(e.target.value)} required />
-
-        <label><i className="fa-solid fa-file-image"></i> Upload Company Image:</label>
-        <input type="file" accept="image/*" onChange={handleCompanyImageUpload} ref={companyImageInputRef} required />
-
-        <label><i className="fa-solid fa-code"></i> Skills Required:</label>
-        <input type="text" placeholder="E.g. JavaScript, React, Python" value={skillsRequired} onChange={(e) => setSkillsRequired(e.target.value)} required />
-
-        <label><i className="fa-solid fa-file-alt"></i> Job Description:</label>
-        <textarea value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} required></textarea>
-
-        <button type="submit"><i className="fa-solid fa-paper-plane"></i> Post Job</button>
-      </form>
+      <div className="dashboard-content">
+        {activeTab === "post-job" && (
+          <PostJobTab 
+            editingJobId={editingJobId}
+            recruiterName={recruiterName}
+            setRecruiterName={setRecruiterName}
+            email={email}
+            company={company}
+            setCompany={setCompany}
+            companyImagePreview={companyImagePreview}
+            skillsRequired={skillsRequired}
+            setSkillsRequired={setSkillsRequired}
+            salaryRange={salaryRange}
+            setSalaryRange={setSalaryRange}
+            jobLocation={jobLocation}
+            setJobLocation={setJobLocation}
+            Matchingpercentage={Matchingpercentage}
+            setMatchingpercentage={setMatchingpercentage}
+            location={location}
+            setLocation={setLocation}
+            jobDescription={jobDescription}
+            setJobDescription={setJobDescription}
+            handleCompanyImageChange={handleCompanyImageChange}
+            companyImageInputRef={companyImageInputRef}
+            resetForm={resetForm}
+            handleSubmit={submitJobForm}
+          />
+        )}
+        
+        {activeTab === "posted-jobs" && (
+          <PostedJobsTab 
+            loading={loading}
+            postedJobs={postedJobs}
+            handleEditJob={handleJobEdit}
+            handleDeleteJob={handleJobDelete}
+            setActiveTab={setActiveTab}
+          />
+        )}
+        
+        {activeTab === "conduct-drive" && (
+          <ConductDriveTab 
+            driveName={driveName}
+            setDriveName={setDriveName}
+            driveCapacity={driveCapacity}
+            setDriveCapacity={setDriveCapacity}
+            driveDate={driveDate}
+            setDriveDate={setDriveDate}
+            driveTime={driveTime}
+            setDriveTime={setDriveTime}
+            driveLocation={driveLocation}
+            setDriveLocation={setDriveLocation}
+            driveDescription={driveDescription}
+            setDriveDescription={setDriveDescription}
+            drives={drives}
+            loadingDrives={loadingDrives}
+            handleDeleteDrive={handleDriveDelete}
+            handleDriveSubmit={submitDriveForm}
+          />
+        )}
+      </div>
     </div>
   );
 }

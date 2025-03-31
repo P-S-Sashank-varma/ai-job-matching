@@ -23,8 +23,6 @@ async def get_matching_jobs(user: dict = Depends(get_current_user)):
     jobs = await recruiter_dashboard_collection.find().to_list(100)
 
     print("\n🔹 Full Job Documents from MongoDB:")
-    for job in jobs:
-        print(job)  # ✅ DEBUG PRINT FULL JOB ENTRY
 
     for job in jobs:
         required_skills = set(job.get("skills_required", "").lower().split(","))
@@ -40,10 +38,8 @@ async def get_matching_jobs(user: dict = Depends(get_current_user)):
                 "matched_skills": list(matched_skills),
                 "match_percentage": round(match_percentage, 2),
                 "company_image_url": job.get("company_image_url", ""),
-                "email": job.get("email", "⚠️ Email Missing!")  # ✅ Explicit Warning if Email is Missing
+                "email": job.get("email", "⚠️ Email Missing!") 
             }
-
-            print("\n✅ Processed Job Entry:", job_entry)  # ✅ DEBUG PRINT FINAL ENTRY
             matched_jobs.append(job_entry)
 
     return JSONResponse({"email": email, "matched_jobs": matched_jobs})

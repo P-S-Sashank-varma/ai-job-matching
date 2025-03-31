@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
-import "../styles/Job.css"; // Import Job CSS for styling
+import { Search } from "lucide-react";
+import "../styles/Job.css";
 
-const Job = () => {
-  const [jobs, setJobs] = useState([]); // Store fetched jobs
+const Jobs = () => {
+  const [jobs, setJobs] = useState([]);
+  const [filteredJobs, setFilteredJobs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    // Fetch job listings from backend
     const fetchJobs = async () => {
       try {
         const response = await fetch("http://127.0.0.1:8000/recruiter-dashboard");
@@ -14,11 +16,12 @@ const Job = () => {
           throw new Error("Failed to fetch jobs");
         }
         const data = await response.json();
-        console.log("Fetched jobs:", data); // ✅ Debugging: Check API response
+        console.log("Fetched jobs:", data);
         setJobs(data);
-        setLoading(false);
+        setFilteredJobs(data);
       } catch (error) {
         console.error("Error fetching jobs:", error);
+      } finally {
         setLoading(false);
       }
     };
@@ -26,34 +29,80 @@ const Job = () => {
     fetchJobs();
   }, []);
 
+  const handleSearch = () => {
+    if (!searchTerm.trim()) {
+      setFilteredJobs(jobs);
+      return;
+    }
+    
+    const filtered = jobs.filter(job => 
+      job.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      job.recruiter_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      job.skills_required?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      job.job_location?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredJobs(filtered);
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   return (
-    <div className="job-container">
-      <h2 className="job-heading">Available Jobs</h2>
+    <div className="jobs-section">
+      <h2 className="jobs-title">Available Jobs</h2>
+
+      <div className="search-container">
+        <input
+          type="text"
+          placeholder="Search by company, skills, location..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyPress={handleKeyPress}
+          className="search-input"
+        />
+        <button onClick={handleSearch} className="search-button">
+          <Search className="search-icon" />
+          Search
+        </button>
+      </div>
+
       {loading ? (
-        <p className="loading-text">Loading jobs...</p>
-      ) : jobs.length === 0 ? (
-        <p className="no-jobs">No jobs available.</p>
+        <p className="loading-message">Loading jobs...</p>
+      ) : filteredJobs.length === 0 ? (
+        <p className="no-jobs-message">No jobs available.</p>
       ) : (
-        <div className="job-list">
-          {jobs.map((job, index) => (
-            <div key={index} className="job-card">
-              <img src={job.company_image_url} alt="Company Logo" className="company-logo" />
-              <div className="job-info">
-                <h3 className="company-name">{job.company}</h3>
-                <p className="job-detail"><strong>Recruiter:</strong> {job.recruiter_name}</p>
-                <p className="job-detail"><strong>Posted On:</strong> {new Date().toLocaleString()}</p>
-                
-                {/* Skills Section */}
-                <div className="job-skills">
+        <div className="jobs-grid">
+          {filteredJobs.map((job, index) => (
+            <div key={index} className="job-item-card">
+              <img 
+                src={job.company_image_url} 
+                alt={`${job.company} Logo`} 
+                className="company-image" 
+              />
+
+              <div className="job-details">
+                <h3 className="company-title">{job.company}</h3>
+                <p className="job-info"><strong>Recruiter:</strong> {job.recruiter_name}</p>
+                <p className="job-info"><strong>Posted On:</strong> {new Date().toLocaleDateString()}</p>
+                <p className="job-info"><strong>Salary:</strong> {job.salary_range || "Not specified"}</p>
+                <p className="job-info"><strong>Location:</strong> {job.job_location || "Not specified"}</p>
+                <p className="job-info"><strong>Match Percentage:</strong> {job.match_percentage || "0"}%</p>
+
+                <div className="skills-container">
                   <strong>Skills Required:</strong>
                   <ul className="skills-list">
-                    {(job.skills_required || "No skills listed").split(",").map((skill, idx) => (
-                      <li key={idx} className="skill">{skill.trim()}</li>
-                    ))}
+                    {(job.skills_required || "No skills listed")
+                      .split(",")
+                      .map((skill, idx) => (
+                        <li key={idx} className="skill-item">{skill.trim()}</li>
+                      ))}
                   </ul>
                 </div>
                 
-                <button className="apply-button">AI will APPLY</button>
+                <button className="apply-btn">AI will APPLY</button>
               </div>
             </div>
           ))}
@@ -63,4 +112,4 @@ const Job = () => {
   );
 };
 
-export default Job;
+export default Jobs;

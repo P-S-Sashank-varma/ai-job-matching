@@ -15,3 +15,4 @@ db = client["SkillSync"]
 # Create collections
 user_dashboard_collection = db["user_dashboard"]
 recruiter_dashboard_collection = db["recruiter_dashboard"]
+drives_collection = db["drives"] 

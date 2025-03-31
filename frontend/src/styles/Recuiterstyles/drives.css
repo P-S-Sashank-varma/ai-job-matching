@@ -1,0 +1,104 @@
+
+/* drives.css - Recruitment drives specific styles */
+@import './base.css';
+
+/* Drive section specific styles */
+.drive-form {
+  background: linear-gradient(145deg, #ffffff, var(--soft-yellow));
+  border-radius: 12px;
+  padding: 1.75rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.drive-card {
+  padding: 1.75rem;
+  background: linear-gradient(145deg, #ffffff, var(--soft-green));
+  border-radius: 16px;
+  box-shadow: 0 8px 20px var(--card-shadow);
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-speed) ease;
+}
+
+.drive-card:nth-child(3n+1) {
+  background: linear-gradient(145deg, #ffffff, var(--soft-blue));
+}
+
+.drive-card:nth-child(3n+2) {
+  background: linear-gradient(145deg, #ffffff, var(--soft-purple));
+}
+
+.drive-card:nth-child(3n+3) {
+  background: linear-gradient(145deg, #ffffff, var(--soft-green));
+}
+
+.drive-card:hover {
+  box-shadow: 0 16px 30px var(--card-hover-shadow);
+  transform: translateY(-5px);
+}
+
+.drive-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+}
+
+.drive-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  color: var(--text-primary);
+}
+
+.drive-date {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.drive-content {
+  margin-top: 1.25rem;
+}
+
+.drive-property {
+  display: flex;
+  margin-bottom: 0.75rem;
+}
+
+.drive-property-label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  width: 150px;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.drive-property-value {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.status-chip {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.9rem;
+  border-radius: 2rem;
+}
+
+.status-scheduled {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.status-completed {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-cancelled {
+  background-color: #ffebee;
+  color: #c62828;
+}

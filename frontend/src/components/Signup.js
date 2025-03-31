@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "../styles/LoginSignup.css";  // CSS file for styling
+import "../styles/Signup.css";  // CSS file for styling
 import { FaUser, FaEnvelope, FaLock } from 'react-icons/fa';  // Icons for user, email, and lock
 
 const Signup = () => {

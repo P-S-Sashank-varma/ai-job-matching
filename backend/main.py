@@ -6,7 +6,10 @@ import os
 import re
 from typing import List
 from dotenv import load_dotenv
-
+from database import drives_collection
+from fastapi import Form
+from datetime import datetime
+from bson import ObjectId
 # ✅ Load environment variables
 load_dotenv()
 
@@ -111,6 +114,96 @@ async def evaluate_answer(data: AnswerRequest):
     return {"score": max(0, min(10, score))}
 
 # ✅ Health Check Endpoint
+
+
+
+# Pydantic Model for Drive Input
+class Drive(BaseModel):
+    name: str
+    date: str
+    time: str
+    location: str
+    description: str
+    capacity: str
+    recruiter_email: str
+    recruiter_name: str
+
+
+# Pydantic Model for Drive Response
+class DriveResponse(BaseModel):
+    id: str
+    name: str
+    date: str
+    time: str
+    location: str
+    description: str
+    capacity: str
+    recruiter_email: str
+    recruiter_name: str
+    status: str
+    created_at: datetime
+
+
+# Route to create a new drive
+@app.post("/drives/", response_model=DriveResponse)
+async def create_drive(
+    name: str = Form(...),
+    date: str = Form(...),
+    time: str = Form(...),
+    location: str = Form(...),
+    description: str = Form(...),
+    capacity: str = Form(...),
+    recruiter_email: str = Form(...),
+    recruiter_name: str = Form(...),
+):
+    drive_data = {
+        "name": name,
+        "date": date,
+        "time": time,
+        "location": location,
+        "description": description,
+        "capacity": capacity,
+        "recruiter_email": recruiter_email,
+        "recruiter_name": recruiter_name,
+        "status": "Scheduled",
+        "created_at": datetime.utcnow(),
+    }
+
+    result = await drives_collection.insert_one(drive_data)
+    created_drive = await drives_collection.find_one({"_id": result.inserted_id})
+    created_drive["id"] = str(created_drive["_id"])
+
+    return DriveResponse(**created_drive)
+
+
+# Route to fetch all drives for a recruiter
+@app.get("/drives/{recruiter_email}", response_model=List[DriveResponse])
+async def get_recruiter_drives(recruiter_email: str):
+    drives = await drives_collection.find({"recruiter_email": recruiter_email}).to_list(None)
+
+    for drive in drives:
+        drive["id"] = str(drive["_id"])
+
+    return drives
+
+
+# Route to delete a drive
+@app.delete("/drives/{drive_id}")
+async def delete_drive(drive_id: str):
+    drive = await drives_collection.find_one({"_id": ObjectId(drive_id)})
+
+    if not drive:
+        raise HTTPException(status_code=404, detail="Drive not found")
+
+    result = await drives_collection.delete_one({"_id": ObjectId(drive_id)})
+
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Drive not found")
+
+    return {"message": "Drive deleted successfully"}
+
+
 @app.get("/")
 async def read_root():
     return {"message": "✅ FastAPI - AI HR Interview System is running!"}
+

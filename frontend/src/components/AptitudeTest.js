@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 //import { useNavigate } from "react-router-dom";
 
 import "../styles/Aptitude.css";
-
+//import WebcamCapture from "./WebcamCapture";
 // 10 Aptitude Questions
 const questionBank = [
   { id: 1, question: "What is 25% of 400?", options: ["75", "100", "125", "150"], answer: "100" },

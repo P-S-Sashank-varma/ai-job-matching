@@ -14,13 +14,60 @@ os.makedirs(RESUME_DIR, exist_ok=True)  # Ensure directory exists
 
 # ✅ Define Skills List - Unchanged
 SKILL_SET = {
-    "html", "css", "javascript", "react", "angular", "flask", "nodejs", "expressjs",
-    "mongodb", "sql", "mysql", "c", "c++", "java", "python", "r language", "c#", "php",
-    "go", "machine learning", "ai", "dl", "deep learning", "nlp", "aws", "mean",
-    "mern", "Power Bi", "devops", "linux", "cyber security", "tableau", "iot",
-    "data analytics", "dsa", "data structures and algorithms","Excel"
+    # Programming Languages
+    "c", "c++", "java", "python", "c#", "php", "r language", "go", "swift", "kotlin", "dart", "typescript", "javascript", "rust", "scala", "haskell", "elixir", "lua", "perl", "ruby",
+    
+    # Web Development
+    "html", "css", "html5", "css3", "javascript (ES6+)", "typescript", "react.js", "angular.js", "vue.js", "svelte", "next.js", "nuxt.js", "bootstrap", "tailwindcss", "material-ui", "chakra-ui", "scss", "less", "jquery", "webpack", "vite", "parcel", "babel",
+    
+    # Backend Development
+    "nodejs", "expressjs", "flask", "django", "fastapi", "spring boot", "asp.net", "ruby on rails", "laravel", "symfony", "nestjs", "adonisjs", "gin-gonic", "fiber", "hapi.js", "koa.js",
+    
+    # Databases
+    "mongodb", "sql", "mysql", "postgresql", "sqlite", "firebase", "dynamodb", "cassandra", "neo4j", "redis", "couchdb", "arangodb", "cockroachdb", "tidb",
+    
+    # Cloud & DevOps
+    "aws", "gcp", "azure", "docker", "kubernetes", "terraform", "ansible", "jenkins", "github actions", "gitlab ci/cd", "travis ci", "circleci", "aws lambda", "heroku", "vercel", "netlify", "digitalocean", "cloudflare",
+    
+    # AI/ML
+    "machine learning", "deep learning", "tensorflow", "keras", "pytorch", "scikit-learn", "hugging face", "openai api", "spacy", "nltk", "gensim", "opencv", "mediapipe", "mlflow", "kubeflow", "ray", "dask", "fastai", "nlp",
+    
+    # Cybersecurity
+    "cyber security", "penetration testing", "ethical hacking", "metasploit", "burp suite", "nmap", "wireshark", "osint", "forensics", "kali linux", "snort", "owasp top 10",
+    
+    # Blockchain & Web3
+    "solidity", "web3.js", "ethers.js", "truffle", "hardhat", "polygon", "binance smart chain", "nft development", "ipfs", "smart contracts",
+    
+    # Networking
+    "tcp/ip", "dns", "dhcp", "vpn", "firewalls", "load balancing", "proxy servers", "nginx", "apache", "haproxy",
+    
+    # Mobile App Development
+    "react native", "flutter", "kotlin", "swift", "dart", "xamarin", "cordova", "ionic",
+    
+    # Big Data & Data Engineering
+    "hadoop", "spark", "kafka", "apache flink", "hive", "pig", "airflow", "dbt", "delta lake",
+    
+    # Operating Systems
+    "windows", "macos", "ubuntu", "centos", "debian", "redhat", "arch linux", "freebsd",
+    
+    # Game Development
+    "unity", "unreal engine", "godot", "cocos2d", "phaser.js",
+    
+    # UI/UX & Graphic Design
+    "figma", "adobe xd", "sketch", "photoshop", "illustrator", "invision", "blender",
+    
+    # Data Analytics & Business Intelligence
+    "Power BI", "tableau", "excel", "data analytics", "business intelligence",
+    
+    # Testing
+    "jest", "mocha", "chai", "cypress", "selenium", "junit", "pytest",
+    
+    # Productivity & Tools
+    "git", "github", "gitlab", "bitbucket", "postman", "swagger", "notion", "slack", "jira", "confluence",
+    
+    # Soft Skills
+    "communication", "leadership", "teamwork", "critical thinking", "problem-solving", "time management", "negotiation"
 }
-
 # ✅ Function to Extract Text from PDF - Unchanged
 def extract_text_from_pdf(pdf_path):
     text = []

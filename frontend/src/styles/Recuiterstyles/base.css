@@ -1,0 +1,220 @@
+/* base.css - Contains variables and basic styles */
+:root {
+    --primary-blue: #3a86ff;
+    --primary-hover: #2d6cdb;
+    --secondary-purple: #8338ec;
+    --success-green: #06d6a0;
+    --warning-yellow: #ffbe0b;
+    --danger-red: #ff5a5f;
+    --light-gray: #f8f9fa;
+    --medium-gray: #e9ecef;
+    --dark-gray: #495057;
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --border-color: #dee2e6;
+    --card-shadow: rgba(0, 0, 0, 0.05);
+    --card-hover-shadow: rgba(0, 0, 0, 0.1);
+    --transition-speed: 0.3s;
+    
+    /* New color variables */
+    --soft-blue: #e6f0ff;
+    --soft-purple: #f0e6ff;
+    --soft-green: #e6fff0;
+    --soft-yellow: #fffde6;
+    --soft-red: #ffe6e6;
+    --soft-gray: #f0f2f5;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  @keyframes slideIn {
+    from { transform: translateX(-20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  
+  .recruiter-dashboard {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem;
+    color: var(--text-primary);
+    animation: fadeIn 0.6s ease-out;
+    align-items: center;
+  }
+  
+  .dashboard-header {
+    text-align: center;
+    margin-bottom: 3.5rem;
+    animation: fadeIn 0.8s ease-out;
+  }
+  
+  .dashboard-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    background: linear-gradient(90deg, var(--primary-blue), var(--secondary-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.5px;
+  }
+  
+  .dashboard-header p {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+  
+  .dashboard-tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: linear-gradient(90deg, var(--primary-blue), var(--secondary-purple));
+    color: white;
+    padding: 0.35rem 1rem;
+    border-radius: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .dashboard-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .dashboard-section {
+    background-color: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px var(--card-shadow);
+    transition: all var(--transition-speed) ease;
+    animation: fadeIn 0.6s ease-out;
+    border: 1px solid var(--border-color);
+  }
+  
+  .section-header {
+    padding: 1.75rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: rgba(255, 255, 255, 0.7);
+  }
+  
+  .section-header h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+  }
+  
+  .section-header-icon {
+    height: 2.5rem;
+    width: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--light-gray);
+    border-radius: 50%;
+    color: var(--primary-blue);
+  }
+  
+  .section-content {
+    padding: 2rem;
+  }
+  
+  /* Tabs */
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 2rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    background: linear-gradient(to right, var(--soft-blue), var(--soft-purple));
+    border-radius: 8px 8px 0 0;
+    padding: 0.5rem 0.5rem 0;
+  }
+  
+  .tabs::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .tab {
+    padding: 1rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 8px 8px 0 0;
+    margin-right: 0.25rem;
+  }
+  
+  .tab.active {
+    color: var(--primary-blue);
+    border-bottom-color: var(--primary-blue);
+    background-color: white;
+  }
+  
+  .tab:hover:not(.active) {
+    color: var(--text-primary);
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+  
+  /* Loading states */
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4rem 0;
+    color: var(--text-secondary);
+  }
+  
+  .loading-spinner {
+    display: inline-block;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 3px solid rgba(58, 134, 255, 0.2);
+    border-left-color: var(--primary-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 1rem;
+  }
+  
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 1.5rem 0 1rem;
+    color: var(--text-primary);
+  }
+  
+  /* Responsive adjustments */
+  @media (min-width: 1024px) {
+    .dashboard-content {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .dashboard-content {
+      grid-template-columns: 1fr;
+    }
+    
+    .section-content {
+      padding: 1.5rem;
+    }
+  }
+  
