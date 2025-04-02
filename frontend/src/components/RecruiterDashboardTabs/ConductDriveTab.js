@@ -58,6 +58,30 @@ export const ConductDriveTab = ({
                 />
               </div>
               
+            <div className="form-group">
+              <label>Recruiter Name</label>
+              <input 
+                type="text" 
+                className="form-control" 
+                value={recruiterName1} 
+                onChange={(e) => setRecruiterName1(e.target.value)} 
+                placeholder="Recruiter's Name" 
+                required 
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>Recruiter Email</label>
+              <input 
+                type="email" 
+                className="form-control" 
+                value={recruiterEmail1} 
+                onChange={(e) => setRecruiterEmail1(e.target.value)} 
+                placeholder="Recruiter's Email" 
+                required 
+              />
+            </div>
+              
               <div className="form-group">
                 <label>Capacity</label>
                 <input 
@@ -118,29 +142,6 @@ export const ConductDriveTab = ({
               ></textarea>
             </div>
             
-            <div className="form-group">
-              <label>Recruiter Name</label>
-              <input 
-                type="text" 
-                className="form-control" 
-                value={recruiterName1} 
-                onChange={(e) => setRecruiterName1(e.target.value)} 
-                placeholder="Recruiter's Name" 
-                required 
-              />
-            </div>
-            
-            <div className="form-group">
-              <label>Recruiter Email</label>
-              <input 
-                type="email" 
-                className="form-control" 
-                value={recruiterEmail1} 
-                onChange={(e) => setRecruiterEmail1(e.target.value)} 
-                placeholder="Recruiter's Email" 
-                required 
-              />
-            </div>
             
             <div className="form-actions">
               <button type="submit" className="btn btn-primary">
@@ -170,6 +171,17 @@ export const ConductDriveTab = ({
                   </span>
                 </div>
                 
+
+                <div className="drive-property">
+                    <div className="drive-property-label">Recruiter Name:</div>
+                    <div className="drive-property-value">{drive.recruiter_name}</div>
+                  </div>
+                  
+                  <div className="drive-property">
+                    <div className="drive-property-label">Recruiter Email:</div>
+                    <div className="drive-property-value">{drive.recruiter_email}</div>
+                  </div>
+
                 <div className="drive-content">
                   <div className="drive-property">
                     <div className="drive-property-label">Location:</div>
@@ -184,16 +196,6 @@ export const ConductDriveTab = ({
                   <div className="drive-property">
                     <div className="drive-property-label">Description:</div>
                     <div className="drive-property-value">{drive.description}</div>
-                  </div>
-                  
-                  <div className="drive-property">
-                    <div className="drive-property-label">Recruiter Name:</div>
-                    <div className="drive-property-value">{drive.recruiter_name}</div>
-                  </div>
-                  
-                  <div className="drive-property">
-                    <div className="drive-property-label">Recruiter Email:</div>
-                    <div className="drive-property-value">{drive.recruiter_email}</div>
                   </div>
                 </div>
                 

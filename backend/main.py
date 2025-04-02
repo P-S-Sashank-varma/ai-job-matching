@@ -188,7 +188,14 @@ async def delete_drive(drive_id: str):
 
     return {"message": "Drive deleted successfully"}
 
+@app.get("/drives/", response_model=List[DriveResponse])
+async def get_all_drives():
+    drives = await drives_collection.find().to_list(None)
 
+    for drive in drives:
+        drive["id"] = str(drive["_id"])
+
+    return [DriveResponse(**drive) for drive in drives]
 
 @app.get("/")
 async def read_root():
