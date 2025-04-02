@@ -37,7 +37,7 @@
     transition: all var(--transition-speed) ease;
     animation: fadeIn 0.6s ease-out;
     border: 1px solid var(--border-color);
-    max-width: 580px; /* Fixed width to prevent content from disappearing */
+    max-width: 500px; /* Fixed width to prevent content from disappearing */
     min-width: 180px;
     max-height:300px;
     padding: 0.75rem; /* Reduced padding */

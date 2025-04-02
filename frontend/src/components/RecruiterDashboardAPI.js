@@ -270,7 +270,6 @@ export const handleJobSubmit = async (
   }
 };
 
-// Handle drive form submission
 export const handleDriveSubmit = async (
   e,
   driveName,
@@ -279,10 +278,10 @@ export const handleDriveSubmit = async (
   driveLocation,
   driveDescription,
   driveCapacity,
-  email,
+  recruiterEmail,  // ensure this is a string, not the function
   recruiterName,
   setDrives,
-  resetDriveForm
+  resetDriveForm,  // ensure this is a string, not the function
 ) => {
   e.preventDefault();
   
@@ -296,6 +295,8 @@ export const handleDriveSubmit = async (
     location: driveLocation,
     description: driveDescription,
     capacity: driveCapacity,
+    recruiterEmail: recruiterEmail,  // pass the actual email value
+    recruiterName: recruiterName     // pass the actual name value
   });
 
   try {
@@ -306,6 +307,8 @@ export const handleDriveSubmit = async (
     formData.append("location", driveLocation);
     formData.append("description", driveDescription);
     formData.append("capacity", driveCapacity);
+    formData.append("recruiter_name", recruiterName);  // pass the actual name value
+    formData.append("recruiter_email", recruiterEmail);  // pass the actual email value
 
     const response = await fetch("http://127.0.0.1:8000/drives/", {
       method: "POST",
@@ -334,8 +337,8 @@ export const handleDriveSubmit = async (
       location: driveLocation,
       description: driveDescription,
       capacity: driveCapacity,
-      recruiter_email: email,
-      recruiter_name: recruiterName,
+      recruiterEmail: recruiterEmail,  // use the string value here
+      recruiterName: recruiterName,    // use the string value here
       status: "Scheduled"
     };
 
@@ -344,4 +347,63 @@ export const handleDriveSubmit = async (
   }
 
   resetDriveForm();
+};
+
+
+
+
+// Decode JWT token
+export const decodeToken = (token) => {
+  try {
+    // JWT tokens are in format: header.payload.signature
+    // We only need the payload, which is the second part
+    const base64Url = token.split('.')[1];
+    if (!base64Url) return null;
+    
+    // Convert base64url to base64
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    
+    // Decode the payload
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => `%${(`00${c.charCodeAt(0).toString(16)}`).slice(-2)}`)
+        .join('')
+    );
+    
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error("Error decoding token:", error);
+    return null;
+  }
+};
+
+// Fetch recruiter profile from the database
+export const fetchRecruiterProfile = async (email) => {
+  try {
+    const token = localStorage.getItem("token") || "dummy-token";
+    
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/recruiter-profile/${encodeURIComponent(email)}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      if (response.ok) {
+        return await response.json();
+      } else {
+        console.log("Failed to fetch recruiter profile");
+        return null;
+      }
+    } catch (error) {
+      console.log("API error fetching recruiter profile");
+      // For demo purposes, return a mock profile based on email
+      return {
+        name: email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1),
+        email: email,
+      };
+    }
+  } catch (error) {
+    console.error("Error fetching recruiter profile:", error);
+    return null;
+  }
 };

@@ -3,6 +3,7 @@ from fastapi.responses import FileResponse
 from database import recruiter_dashboard_collection
 import os
 from bson import ObjectId
+from jose import JWTError, jwt
 
 # Initialize router
 router = APIRouter()
@@ -195,3 +196,4 @@ async def update_job(
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error updating job: {str(e)}")
+

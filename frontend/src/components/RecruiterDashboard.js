@@ -12,7 +12,9 @@ import {
   handleDeleteJob, 
   handleDeleteDrive, 
   handleJobSubmit,
-  handleDriveSubmit
+  handleDriveSubmit,
+  decodeToken,
+  fetchRecruiterProfile
 } from "./RecruiterDashboardAPI";
 
 function RecruiterDashboard() {
@@ -42,16 +44,70 @@ function RecruiterDashboard() {
   const [driveCapacity, setDriveCapacity] = useState("");
   const [drives, setDrives] = useState([]);
   const [loadingDrives, setLoadingDrives] = useState(false);
+  const [recruiterName1, setRecruiterName1] = useState("");
+  const [recruiterEmail1, setRecruiterEmail1] = useState("");
+  
 
   const companyImageInputRef = useRef(null);
 
+  // Initialize recruiter info from token on component mount
   useEffect(() => {
-    fetchJobs(email, setPostedJobs, setLoading);
-    fetchDrives(email, setDrives, setLoadingDrives);
+    const initializeRecruiterInfo = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          console.log("No token found, using demo data");
+          setEmail("demo@example.com");
+          setRecruiterName("Demo Recruiter");
+          setRecruiterEmail1("demo@example.com");
+          setRecruiterName1("Demo Recruiter");
+          return;
+        }
+        
+        // Decode token to get email
+        const decodedToken = decodeToken(token);
+        if (decodedToken && decodedToken.email) {
+          setEmail(decodedToken.email);
+          setRecruiterEmail1(decodedToken.email);
+          
+          // Fetch recruiter profile to get name
+          const recruiter = await fetchRecruiterProfile(decodedToken.email);
+          if (recruiter && recruiter.name) {
+            setRecruiterName(recruiter.name);
+            setRecruiterName1(recruiter.name);
+          } else {
+            // Fallback to email username if no name is found
+            const username = decodedToken.email.split('@')[0];
+            setRecruiterName(username);
+            setRecruiterName1(username);
+          }
+        }
+      } catch (error) {
+        console.error("Error initializing recruiter info:", error);
+        toast.error("Error loading profile data");
+        
+        // Set fallback values
+        setEmail("demo@example.com");
+        setRecruiterName("Demo Recruiter");
+        setRecruiterEmail1("demo@example.com");
+        setRecruiterName1("Demo Recruiter");
+      }
+    };
+    
+    initializeRecruiterInfo();
+  }, []);
+
+  // Fetch jobs and drives when email changes
+  useEffect(() => {
+    if (email) {
+      fetchJobs(email, setPostedJobs, setLoading);
+      fetchDrives(email, setDrives, setLoadingDrives);
+    }
   }, [email]);
 
   // Reset form for job posting
   const resetForm = () => {
+    // Keep the recruiter name and email, reset other fields
     setCompany("");
     setJobDescription("");
     setSkillsRequired("");
@@ -73,6 +129,7 @@ function RecruiterDashboard() {
     setDriveLocation("");
     setDriveDescription("");
     setDriveCapacity("");
+    // Don't reset the recruiter email and name
   };
 
   // Event handlers with state reference passing
@@ -133,10 +190,10 @@ function RecruiterDashboard() {
       driveLocation,
       driveDescription,
       driveCapacity,
-      email,
-      recruiterName,
+      recruiterEmail1,
+      recruiterName1,
       setDrives,
-      resetDriveForm
+      resetDriveForm,
     );
   };
 
@@ -144,7 +201,7 @@ function RecruiterDashboard() {
     <div className="recruiter-dashboard">
       <div className="dashboard-header">
         <span className="dashboard-tag">Recruiter Portal</span>
-        <h1>Welcome, {recruiterName}</h1>
+        <h1>Welcome, {recruiterName || "Recruiter"}</h1>
         <p>Manage your job postings and recruitment drives all in one place.</p>
       </div>
 
@@ -222,6 +279,10 @@ function RecruiterDashboard() {
             setDriveLocation={setDriveLocation}
             driveDescription={driveDescription}
             setDriveDescription={setDriveDescription}
+            recruiterEmail1={recruiterEmail1}
+            recruiterName1={recruiterName1}
+            setRecruiterEmail1={setRecruiterEmail1}
+            setRecruiterName1={setRecruiterName1}
             drives={drives}
             loadingDrives={loadingDrives}
             handleDeleteDrive={handleDriveDelete}

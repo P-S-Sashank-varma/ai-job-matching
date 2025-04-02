@@ -13,27 +13,38 @@ export const ConductDriveTab = ({
   setDriveLocation,
   driveDescription,
   setDriveDescription,
+  recruiterName1,
+  setRecruiterName1,
+  recruiterEmail1,
+  setRecruiterEmail1,
   drives,
   loadingDrives,
   handleDeleteDrive,
   handleDriveSubmit
 }) => {
+  const handleSubmitWithLogging = (e) => {
+    e.preventDefault(); // Prevent default form submission
+    console.log("Drive Name:", driveName);
+    console.log("Drive Capacity:", driveCapacity);
+    console.log("Drive Date:", driveDate);
+    console.log("Drive Time:", driveTime);
+    console.log("Drive Location:", driveLocation);
+    console.log("Drive Description:", driveDescription);
+    console.log("Recruiter Name:", recruiterName1);
+    console.log("Recruiter Email:", recruiterEmail1);
+    
+    // Call the actual submit handler passed as prop
+    handleDriveSubmit(e);
+  };
+
   return (
     <div className="dashboard-section" style={{ gridColumn: "span 2" }}>
       <div className="section-header">
         <h2>Conduct a Drive</h2>
-        <div className="section-header-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-            <circle cx="9" cy="7" r="4"></circle>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-          </svg>
-        </div>
       </div>
       <div className="section-content">
         <div className="drive-form">
-          <form className="dashboard-form" onSubmit={handleDriveSubmit}>
+          <form className="dashboard-form" onSubmit={handleSubmitWithLogging}>
             <div className="form-row">
               <div className="form-group">
                 <label>Drive Name</label>
@@ -50,7 +61,7 @@ export const ConductDriveTab = ({
               <div className="form-group">
                 <label>Capacity</label>
                 <input 
-                  type="number" 
+                  type="text" 
                   className="form-control" 
                   value={driveCapacity} 
                   onChange={(e) => setDriveCapacity(e.target.value)} 
@@ -107,17 +118,32 @@ export const ConductDriveTab = ({
               ></textarea>
             </div>
             
+            <div className="form-group">
+              <label>Recruiter Name</label>
+              <input 
+                type="text" 
+                className="form-control" 
+                value={recruiterName1} 
+                onChange={(e) => setRecruiterName1(e.target.value)} 
+                placeholder="Recruiter's Name" 
+                required 
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>Recruiter Email</label>
+              <input 
+                type="email" 
+                className="form-control" 
+                value={recruiterEmail1} 
+                onChange={(e) => setRecruiterEmail1(e.target.value)} 
+                placeholder="Recruiter's Email" 
+                required 
+              />
+            </div>
+            
             <div className="form-actions">
-              <button 
-                type="submit" 
-                className="btn btn-primary"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="9" cy="7" r="4"></circle>
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                </svg>
+              <button type="submit" className="btn btn-primary">
                 Schedule Drive
               </button>
             </div>
@@ -128,7 +154,6 @@ export const ConductDriveTab = ({
         
         {loadingDrives ? (
           <div className="loading">
-            <div className="loading-spinner"></div>
             <span>Loading drives...</span>
           </div>
         ) : drives.length > 0 ? (
@@ -138,12 +163,10 @@ export const ConductDriveTab = ({
                 <div className="drive-header">
                   <div>
                     <h3 className="drive-title">{drive.name}</h3>
-                    <div className="drive-date">
-                      {drive.date} at {drive.time}
-                    </div>
+                    <div className="drive-date">{drive.date} at {drive.time}</div>
                   </div>
-                  <span className={`status-chip status-${drive.status.toLowerCase()}`}>
-                    {drive.status}
+                  <span className={`status-chip status-${drive.status ? drive.status.toLowerCase() : 'pending'}`}>
+                    {drive.status || "Pending"}
                   </span>
                 </div>
                 
@@ -162,20 +185,24 @@ export const ConductDriveTab = ({
                     <div className="drive-property-label">Description:</div>
                     <div className="drive-property-value">{drive.description}</div>
                   </div>
+                  
+                  <div className="drive-property">
+                    <div className="drive-property-label">Recruiter Name:</div>
+                    <div className="drive-property-value">{drive.recruiter_name}</div>
+                  </div>
+                  
+                  <div className="drive-property">
+                    <div className="drive-property-label">Recruiter Email:</div>
+                    <div className="drive-property-value">{drive.recruiter_email}</div>
+                  </div>
                 </div>
                 
                 <div className="drive-card-actions">
                   <button 
                     className="btn btn-destructive btn-icon"
                     onClick={() => handleDeleteDrive(drive.id)}
-                    title="Delete Drive"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="3 6 5 6 21 6"></polyline>
-                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                      <line x1="10" y1="11" x2="10" y2="17"></line>
-                      <line x1="14" y1="11" x2="14" y2="17"></line>
-                    </svg>
+                    Delete
                   </button>
                 </div>
               </div>
@@ -183,13 +210,6 @@ export const ConductDriveTab = ({
           </div>
         ) : (
           <div className="no-jobs">
-            <div className="no-jobs-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-              </svg>
-            </div>
             <p>No drives scheduled yet. Create your first recruitment drive!</p>
           </div>
         )}

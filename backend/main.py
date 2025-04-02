@@ -116,19 +116,6 @@ async def evaluate_answer(data: AnswerRequest):
 # ✅ Health Check Endpoint
 
 
-
-# Pydantic Model for Drive Input
-class Drive(BaseModel):
-    name: str
-    date: str
-    time: str
-    location: str
-    description: str
-    capacity: str
-    recruiter_email: str
-    recruiter_name: str
-
-
 # Pydantic Model for Drive Response
 class DriveResponse(BaseModel):
     id: str
@@ -137,12 +124,11 @@ class DriveResponse(BaseModel):
     time: str
     location: str
     description: str
-    capacity: str
-    recruiter_email: str
-    recruiter_name: str
+    capacity: int
     status: str
     created_at: datetime
-
+    recruiter_name: str
+    recruiter_email: str
 
 # Route to create a new drive
 @app.post("/drives/", response_model=DriveResponse)
@@ -152,9 +138,9 @@ async def create_drive(
     time: str = Form(...),
     location: str = Form(...),
     description: str = Form(...),
-    capacity: str = Form(...),
-    recruiter_email: str = Form(...),
+    capacity: int = Form(...),
     recruiter_name: str = Form(...),
+    recruiter_email: str = Form(...),
 ):
     drive_data = {
         "name": name,
@@ -163,44 +149,45 @@ async def create_drive(
         "location": location,
         "description": description,
         "capacity": capacity,
-        "recruiter_email": recruiter_email,
-        "recruiter_name": recruiter_name,
         "status": "Scheduled",
         "created_at": datetime.utcnow(),
+        "recruiter_name": recruiter_name,
+        "recruiter_email": recruiter_email,
     }
 
     result = await drives_collection.insert_one(drive_data)
     created_drive = await drives_collection.find_one({"_id": result.inserted_id})
-    created_drive["id"] = str(created_drive["_id"])
-
-    return DriveResponse(**created_drive)
+    
+    if created_drive:
+        created_drive["id"] = str(created_drive["_id"])
+        return DriveResponse(**created_drive)
+    
+    raise HTTPException(status_code=500, detail="Drive creation failed")
 
 
 # Route to fetch all drives for a recruiter
 @app.get("/drives/{recruiter_email}", response_model=List[DriveResponse])
 async def get_recruiter_drives(recruiter_email: str):
-    drives = await drives_collection.find({"recruiter_email": recruiter_email}).to_list(None)
+    drives = await  drives_collection.find({"recruiter_email": recruiter_email}).to_list(None)
 
     for drive in drives:
         drive["id"] = str(drive["_id"])
 
-    return drives
-
+    return [DriveResponse(**drive) for drive in drives]
 
 # Route to delete a drive
 @app.delete("/drives/{drive_id}")
 async def delete_drive(drive_id: str):
-    drive = await drives_collection.find_one({"_id": ObjectId(drive_id)})
-
+    drive = await  drives_collection.find_one({"_id": ObjectId(drive_id)})
     if not drive:
         raise HTTPException(status_code=404, detail="Drive not found")
-
-    result = await drives_collection.delete_one({"_id": ObjectId(drive_id)})
-
+    
+    result = await  drives_collection.delete_one({"_id": ObjectId(drive_id)})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Drive not found")
 
     return {"message": "Drive deleted successfully"}
+
 
 
 @app.get("/")
