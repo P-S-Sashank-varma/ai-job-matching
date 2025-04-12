@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-//import { useNavigate } from "react-router-dom";
-
+import { useNavigate } from "react-router-dom";
 import "../styles/Aptitude.css";
-//import WebcamCapture from "./WebcamCapture";
+
 // 10 Aptitude Questions
 const questionBank = [
   { id: 1, question: "What is 25% of 400?", options: ["75", "100", "125", "150"], answer: "100" },
@@ -23,12 +22,14 @@ const getRandomQuestions = () => {
 };
 
 function Aptitude() {
+  const recruiterEmail = localStorage.getItem("currentRecruiterEmail") || "Unknown";
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState("");
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(10 * 60); // 10 minutes total
   const [completed, setCompleted] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setQuestions(getRandomQuestions());
@@ -41,6 +42,18 @@ function Aptitude() {
     const timer = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
     return () => clearInterval(timer);
   }, [timeLeft]);
+
+  useEffect(() => {
+    if (completed && score >= questions.length * 0.7) {
+      // Mark aptitude test as completed in localStorage for this specific recruiter
+      const completionData = JSON.parse(localStorage.getItem("completionStatus") || "{}");
+      if (!completionData[recruiterEmail]) {
+        completionData[recruiterEmail] = {};
+      }
+      completionData[recruiterEmail].aptitude = true;
+      localStorage.setItem("completionStatus", JSON.stringify(completionData));
+    }
+  }, [completed, score, questions.length, recruiterEmail]);
 
   if (questions.length === 0) return <div className="loading">Loading Questions...</div>;
 
@@ -61,6 +74,10 @@ function Aptitude() {
     } else {
       setCompleted(true);
     }
+  };
+
+  const handleBackToHRInterview = () => {
+    navigate(`/ai-hr-interview/${recruiterEmail}`);
   };
 
   return (
@@ -120,13 +137,16 @@ function Aptitude() {
             {score >= questions.length * 0.7 ? (
               <div className="result-message success">
                 <p>✅ Congratulations! You have passed the aptitude assessment.</p>
-                <p className="next-step-message">Please go to the previous page for the coding round.</p>
+                <p className="next-step-message">Please return to continue with the hiring process.</p>
+                <button onClick={handleBackToHRInterview} className="continue-button">
+                  Return to Hiring Process
+                </button>
               </div>
             ) : (
               <div className="result-message fail">
                 <p>❌ Sorry, you did not meet the passing criteria.</p>
-                <button onClick={() => window.history.back()} className="exit-button">
-                  Exit
+                <button onClick={handleBackToHRInterview} className="exit-button">
+                  Return to Hiring Process
                 </button>
               </div>
             )}

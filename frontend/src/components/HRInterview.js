@@ -1,15 +1,14 @@
-import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import emailjs from "@emailjs/browser";
 import "../styles/HRInterview.css";
-import aiImage from "../images/ai-img-icon.png";
-import { useNavigate } from "react-router-dom";
+import { CheckCircle } from "lucide-react";
 
 const HRInterview = ({ userName }) => {
   const { recruiterEmail } = useParams();
   const decodedRecruiterEmail = recruiterEmail
     ? decodeURIComponent(recruiterEmail)
-    : "Unknown";
+    : localStorage.getItem("currentRecruiterEmail") || "Unknown";
 
   const navigate = useNavigate();
   const [questions, setQuestions] = useState([]);
@@ -21,6 +20,42 @@ const HRInterview = ({ userName }) => {
   const [loading, setLoading] = useState(false);
   const [candidateEmail, setCandidateEmail] = useState("");
   const [showInterview, setShowInterview] = useState(false);
+  
+  // Get completion status for this specific recruiter
+  const [completionData, setCompletionData] = useState({});
+
+  useEffect(() => {
+    // Store the current recruiter email in localStorage
+    if (recruiterEmail) {
+      localStorage.setItem("currentRecruiterEmail", decodedRecruiterEmail);
+    }
+    
+    // Load completion data for this specific recruiter
+    const storedData = JSON.parse(localStorage.getItem("completionStatus") || "{}");
+    const recruiterData = storedData[decodedRecruiterEmail] || {};
+    setCompletionData(recruiterData);
+  }, [decodedRecruiterEmail, recruiterEmail]);
+
+  // Function to update completion status
+  const updateCompletionStatus = (round, isCompleted) => {
+    const storedData = JSON.parse(localStorage.getItem("completionStatus") || "{}");
+    if (!storedData[decodedRecruiterEmail]) {
+      storedData[decodedRecruiterEmail] = {};
+    }
+    storedData[decodedRecruiterEmail][round] = isCompleted;
+    localStorage.setItem("completionStatus", JSON.stringify(storedData));
+    
+    // Update local state
+    setCompletionData(prev => ({
+      ...prev,
+      [round]: isCompleted
+    }));
+  };
+
+  // Check if all rounds are completed
+  const checkAllRoundsCompleted = () => {
+    return completionData.aptitude && completionData.coding && completionData.hr;
+  };
 
   // Function to fetch questions
   const fetchQuestions = async () => {
@@ -85,6 +120,11 @@ const HRInterview = ({ userName }) => {
       const finalScore = Math.round(totalScore / questions.length);
       setScore(finalScore);
 
+      // Update the HR interview completion status
+      if (finalScore >= 0) {
+        updateCompletionStatus("hr", true);
+      }
+
       // Send email only if score is evaluated
       if (finalScore >= 0 && candidateEmail.trim() !== "") {
         sendEmail(finalScore);
@@ -119,97 +159,204 @@ const HRInterview = ({ userName }) => {
       });
   };
 
+  const goToAptitude = () => {
+    navigate(`/aptitude`);
+  };
+
+  const goToCoding = () => {
+    navigate(`/codinground`);
+  };
+
+  // Function to navigate to selected jobs
+  const goToSelectedJobs = () => {
+    navigate("/selectedjobs");
+  };
+
   return (
-    <div className="interview-container">
-      <h2 className="title">AI Hiring Process</h2>
-      <img src={aiImage} alt="AI Icon" className="ai-icon" />
-      <p>
-        <strong>Recruiter Email:</strong> {decodedRecruiterEmail}
-      </p>
+    <div className="main-container">
+      <div className="interview-container">
+        <div className="header-section">
+          <h1 className="title">Smart Hire AI</h1>
+          <p className="subtitle">AI-powered hiring assistant</p>
+        </div>
 
-      <div className="rounds-container">
-  <button className="round-button" onClick={() => navigate("/Aptitude")}>
-    Round 1: Aptitude
-  </button>
-  <button className="round-button" onClick={() => navigate("/codinground")}>
-    Round 2: Coding
-  </button>
-  <button className="round-button" onClick={() => setShowInterview(true)}>
-    Round 3: AI HR Interview
-  </button>
-</div>
+        <div className="recruiter-info">
+          <div className="info-card">
+            <h3>Recruiter</h3>
+            <p>{decodedRecruiterEmail}</p>
+          </div>
+        </div>
 
-
-      {showInterview && (
-        <>
-          {score === null ? (
-            <>
-              {!questions.length ? (
-                <>
-                  <p className="instruction">
-                    Enter your skills and email to generate interview questions:
-                  </p>
-                  <input
-                    type="text"
-                    value={skills}
-                    onChange={(e) => setSkills(e.target.value)}
-                    placeholder="e.g., Python, React, Machine Learning"
-                    className="skills-input"
-                  />
-                  <input
-                    type="email"
-                    value={candidateEmail}
-                    onChange={(e) => setCandidateEmail(e.target.value)}
-                    placeholder="Enter Candidate's Email"
-                    className="email-input"
-                  />
-                  <button
-                    onClick={fetchQuestions}
-                    className="fetch-button"
-                    disabled={loading}
+        <div className="progress-tracker">
+          <div className="progress-card">
+            <h2>Hiring Process</h2>
+            <div className="steps-container">
+              <div className={`step ${completionData.aptitude ? 'completed' : ''}`}>
+                <div className="step-icon">
+                  {completionData.aptitude && <CheckCircle className="check-icon" />}
+                  <span className="step-number">1</span>
+                </div>
+                <div className="step-content">
+                  <h3>Aptitude Test</h3>
+                  <p>Problem-solving assessment</p>
+                  <button 
+                    className={`step-button ${completionData.aptitude ? 'completed' : ''}`}
+                    onClick={goToAptitude}
                   >
-                    {loading ? "Loading..." : "Generate Questions"}
+                    {completionData.aptitude ? 'Completed' : 'Start Test'}
                   </button>
+                </div>
+              </div>
+
+              <div className={`step ${completionData.coding ? 'completed' : ''}`}>
+                <div className="step-icon">
+                  {completionData.coding && <CheckCircle className="check-icon" />}
+                  <span className="step-number">2</span>
+                </div>
+                <div className="step-content">
+                  <h3>Coding Challenge</h3>
+                  <p>Technical skills assessment</p>
+                  <button 
+                    className={`step-button ${completionData.coding ? 'completed' : ''}`}
+                    onClick={goToCoding}
+                    disabled={!completionData.aptitude}
+                  >
+                    {completionData.coding ? 'Completed' : completionData.aptitude ? 'Start Challenge' : 'Complete Aptitude First'}
+                  </button>
+                </div>
+              </div>
+
+              <div className={`step ${completionData.hr ? 'completed' : ''}`}>
+                <div className="step-icon">
+                  {completionData.hr && <CheckCircle className="check-icon" />}
+                  <span className="step-number">3</span>
+                </div>
+                <div className="step-content">
+                  <h3>HR Interview</h3>
+                  <p>AI-powered interview simulation</p>
+                  <button 
+                    className={`step-button ${completionData.hr ? 'completed' : ''}`}
+                    onClick={() => setShowInterview(true)} 
+                    disabled={!completionData.coding}
+                  >
+                    {completionData.hr ? 'Completed' : completionData.coding ? 'Start Interview' : 'Complete Coding First'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {showInterview && (
+          <div className="interview-section">
+            <div className="interview-card">
+              <h2>AI HR Interview</h2>
+              
+              {score === null ? (
+                <>
+                  {!questions.length ? (
+                    <div className="interview-setup">
+                      <h3>Interview Setup</h3>
+                      <p className="instruction">
+                        Enter your skills and email to generate personalized interview questions:
+                      </p>
+                      <div className="input-group">
+                        <input
+                          type="text"
+                          value={skills}
+                          onChange={(e) => setSkills(e.target.value)}
+                          placeholder="e.g., Python, React, Machine Learning"
+                          className="skills-input"
+                        />
+                      </div>
+                      <div className="input-group">
+                        <input
+                          type="email"
+                          value={candidateEmail}
+                          onChange={(e) => setCandidateEmail(e.target.value)}
+                          placeholder="Enter Your Email"
+                          className="email-input"
+                        />
+                      </div>
+                      <button
+                        onClick={fetchQuestions}
+                        className="start-interview-button"
+                        disabled={loading}
+                      >
+                        {loading ? "Generating Questions..." : "Start Interview"}
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="question-section">
+                      <div className="question-progress">
+                        Question {currentQuestionIndex + 1} of {questions.length}
+                      </div>
+                      <div className="question-card">
+                        <p className="question">
+                          {questions[currentQuestionIndex]}
+                        </p>
+                        <textarea
+                          rows="6"
+                          value={answers[currentQuestionIndex] || ""}
+                          onChange={handleAnswerChange}
+                          placeholder="Type your answer here..."
+                          className="answer-textarea"
+                        />
+                        <button
+                          onClick={handleNextQuestion}
+                          className="next-button"
+                          disabled={evaluating || !answers[currentQuestionIndex]}
+                        >
+                          {currentQuestionIndex < questions.length - 1
+                            ? "Next Question"
+                            : "Submit Interview"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </>
               ) : (
-                <>
-                  <p className="question">
-                    <strong>Question {currentQuestionIndex + 1}:</strong>{" "}
-                    {questions[currentQuestionIndex]}
-                  </p>
-                  <textarea
-                    rows="3"
-                    value={answers[currentQuestionIndex] || ""}
-                    onChange={handleAnswerChange}
-                    placeholder="Type your answer here..."
-                    className="answer-box"
-                  />
-                  <button
-                    onClick={handleNextQuestion}
-                    className="next-button"
-                    disabled={evaluating}
-                  >
-                    {currentQuestionIndex < questions.length - 1
-                      ? "Next"
-                      : "Finish"}
-                  </button>
-                </>
+                <div className="results-section">
+                  <div className="results-card">
+                    <h3>Interview Completed</h3>
+                    {evaluating ? (
+                      <div className="evaluating">
+                        <div className="loading-spinner"></div>
+                        <p>Evaluating your responses...</p>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="score-display">
+                          <div className="score-circle">
+                            <span className="score-value">{score}</span>
+                            <span className="score-max">/10</span>
+                          </div>
+                        </div>
+                        <p className="score-message">
+                          {score >= 7 ? "Excellent performance! We'll be in touch soon." : 
+                           score >= 5 ? "Good job! Your application has been submitted." : 
+                           "Thanks for completing the interview."}
+                        </p>
+                        <div className="post-interview-actions">
+                          {checkAllRoundsCompleted() ? (
+                            <button onClick={goToSelectedJobs} className="view-jobs-button">
+                              View All Applications
+                            </button>
+                          ) : (
+                            <button onClick={() => window.location.reload()} className="restart-button">
+                              Start New Application
+                            </button>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
               )}
-            </>
-          ) : (
-            <>
-              <h3 className="completion-text">Interview Completed!</h3>
-              {evaluating ? (
-                <p className="score-text">Evaluating your answers...</p>
-              ) : (
-                <p className="score-text">
-                  Your Score: <strong>{score}/10</strong>
-                </p>
-              )}
-            </>
-          )}
-        </>
-      )}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
