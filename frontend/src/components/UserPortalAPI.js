@@ -1,6 +1,6 @@
 
 import { toast } from "sonner";
-
+import { fetchAppliedJobs as fetchAppliedJobsAPI } from "../services/api";
 export const checkExistingResume = async (userEmail, setHasExistingResume, setName, setPhone, activeTab, location) => {
   try {
     const response = await fetch(`http://127.0.0.1:8000/check-resume/${userEmail}`);
@@ -199,5 +199,59 @@ export const setupDrivesData = async (setUpcomingDrives) => {
     
     // Set empty array if fetch fails
     setUpcomingDrives([]);
+  }
+};
+
+export const fetchAppliedJobs = async (userEmail, setAppliedJobs) => {
+  try {
+    const jobStatuses = await fetchAppliedJobsAPI(userEmail);
+
+    const enrichedJobs = await Promise.all(
+      jobStatuses.map(async (status) => {
+        try {
+          // Fetch job details from the backend using both userEmail and recruiterEmail
+          const jobResponse = await fetch(
+            `http://127.0.0.1:8000/job-status/${encodeURIComponent(userEmail)}/${encodeURIComponent(status.recruiter_email)}`
+          );
+
+          const defaultJob = {
+            id: status.recruiter_email,
+            recruiter_email: status.recruiter_email,
+            company: status.recruiter_email.split('@')[0],
+            title: `Position at ${status.recruiter_email.split('@')[0]}`,
+            completion_status: status.completion_status,
+            applied: true,
+            applicationDate: new Date().toLocaleDateString()
+          };
+
+          if (!jobResponse.ok) {
+            return defaultJob;
+          }
+
+          const jobData = await jobResponse.json();
+          return {
+            ...defaultJob,
+            ...jobData,
+          };
+        } catch (error) {
+          console.error("Error fetching job details:", error);
+          return {
+            id: status.recruiter_email,
+            recruiter_email: status.recruiter_email,
+            company: status.recruiter_email.split('@')[0],
+            title: `Position at ${status.recruiter_email.split('@')[0]}`,
+            completion_status: status.completion_status,
+            applied: true,
+            applicationDate: new Date().toLocaleDateString()
+          };
+        }
+      })
+    );
+
+    setAppliedJobs(enrichedJobs);
+  } catch (error) {
+    console.error("Error fetching applied jobs:", error);
+    toast.error("Failed to load applied jobs.");
+    setAppliedJobs([]);
   }
 };

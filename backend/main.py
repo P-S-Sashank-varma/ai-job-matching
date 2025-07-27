@@ -10,30 +10,36 @@ from database import drives_collection
 from fastapi import Form
 from datetime import datetime
 from bson import ObjectId
+from routes import job_status
+
+
 # ✅ Load environment variables
 load_dotenv()
 
 # ✅ Initialize FastAPI App
 app = FastAPI()
 
-# ✅ CORS Configuration
+# ✅ Add CORS middleware RIGHT AFTER app creation
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Change this in production
+    allow_origins=["http://localhost:3000"],  # Your React frontend
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ✅ Import and Include Routers
-from routes import auth, recruiter_dashboard, user_dashboard, resume_parser, matching_jobs,execute_code
+# ✅ Only now, import routers
+from routes import auth, recruiter_dashboard, user_dashboard, resume_parser, matching_jobs, execute_code, job_status
 
+# ✅ Then include them
 app.include_router(auth.router)
 app.include_router(recruiter_dashboard.router)
 app.include_router(user_dashboard.router)
 app.include_router(resume_parser.router)
 app.include_router(matching_jobs.router)
 app.include_router(execute_code.router)
+app.include_router(job_status.router, prefix="/api")
+
 # ✅ Groq API Configuration
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions"

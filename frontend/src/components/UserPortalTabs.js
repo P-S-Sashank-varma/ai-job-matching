@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState,useEffect} from 'react';
 import { 
   ArrowRight, 
   Upload,
@@ -8,9 +8,10 @@ import {
   CheckCircle,
   Calendar,
   Building,
-  RefreshCw
+  RefreshCw,
+  XCircle
 } from "lucide-react";
-import { handleResumeUpload, handleRegisterDrive } from "./UserPortalAPI";
+import { handleResumeUpload, handleRegisterDrive,fetchAppliedJobs } from "./UserPortalAPI";
 
 export const renderResumeTab = (props) => {
   const { 
@@ -199,66 +200,150 @@ export const renderJobsTab = (props) => {
     </div>
   );
 };
-
+// Fix the function name to follow React conventions for regular functions
 export const renderApplicationsTab = (props) => {
-  const { selectedJobs, navigate } = props;
+  const { selectedJobs, navigate, email } = props;
   
+  // We're moving the hooks to the component in UserPortal.jsx, so this is now a pure rendering function
   return (
     <div className="animate-fade-up">
       <div className="content-header">
         <span className="chip">Your Applications</span>
         <h2 className="text-2xl font-semibold text-[#1d1d1f]">Application Status</h2>
         <p className="text-[#6e6e73]">
-          Track the status of your job applications here.
+          Track the status of your job applications and interview progress here.
         </p>
       </div>
 
-      <div className="space-y-4">
-        {selectedJobs
-          .filter(job => job.applied)
-          .map((job) => (
-            <div key={job.id} className="application-item animate-scale-in">
-              <div className="application-details">
-                <div>
-                  <h3 className="text-lg font-semibold text-[#1d1d1f]">{job.title}</h3>
-                  <p className="text-[#6e6e73] text-sm">{job.company}</p>
-                </div>
-                <span className="application-status">
-                  <Clock size={12} className="mr-1" />
-                  In Review
-                </span>
-              </div>
-              
-              <div className="flex justify-between items-center mt-4 pt-4 border-t border-[#e5e5e7]">
-                <div className="application-date">
-                  Applied on: {new Date().toLocaleDateString()}
+      {props.loadingApplications ? (
+        <div className="flex justify-center items-center py-8">
+          <div className="animate-spin h-8 w-8 border-4 border-indigo-500 rounded-full border-t-transparent"></div>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {props.appliedJobs && props.appliedJobs.length > 0 ? (
+            props.appliedJobs.map((job) => (
+              <div key={job.id} className="application-item animate-scale-in">
+                <div className="application-details">
+                  <div>
+                    <h3 className="text-lg font-semibold text-[#1d1d1f]">
+                      {job.title || `Position at ${job.company}`}
+                    </h3>
+                    <p className="text-[#6e6e73] text-sm">{job.company}</p>
+                  </div>
+                  <span className={`application-status ${props.calculateProgress(job.completion_status) === 100 ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}>
+                    {props.calculateProgress(job.completion_status) === 100 ? (
+                      <>
+                        <CheckCircle size={12} className="mr-1" />
+                        Completed
+                      </>
+                    ) : (
+                      <>
+                        <Clock size={12} className="mr-1" />
+                        In Progress
+                      </>
+                    )}
+                  </span>
                 </div>
                 
-                <button className="btn btn-secondary">
-                  View Details
-                </button>
-              </div>
-            </div>
-          ))}
+                <div className="mt-4">
+                  <div className="flex items-center mb-2">
+                    <div className="text-sm font-medium mr-2">Interview Progress:</div>
+                    <div className="text-sm text-gray-500">
+                      {Math.round(props.calculateProgress(job.completion_status))}% Complete
+                    </div>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-indigo-600 h-2 rounded-full"
+                      style={{ width: `${props.calculateProgress(job.completion_status)}%` }}
+                    ></div>
+                  </div>
+                </div>
 
-        {selectedJobs.filter(job => job.applied).length === 0 && (
-          <div className="empty-state animate-fade-in">
-            <div className="flex justify-center mb-4">
-              <Briefcase size={48} className="text-[#a7a7a7]" />
+                <div className="mt-4 grid grid-cols-3 gap-2">
+                  <div className={`interview-stage ${job.completion_status?.aptitude ? 'completed' : 'pending'}`}>
+                    <div className="stage-icon">
+                      {job.completion_status?.aptitude ? (
+                        <CheckCircle size={14} />
+                      ) : (
+                        <XCircle size={14} />
+                      )}
+                    </div>
+                    <div className="stage-info">
+                      <div className="stage-name">Aptitude</div>
+                      <div className="stage-status">
+                        {job.completion_status?.aptitude ? 'Completed' : 'Pending'}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={`interview-stage ${job.completion_status?.coding ? 'completed' : 'pending'}`}>
+                    <div className="stage-icon">
+                      {job.completion_status?.coding ? (
+                        <CheckCircle size={14} />
+                      ) : (
+                        <XCircle size={14} />
+                      )}
+                    </div>
+                    <div className="stage-info">
+                      <div className="stage-name">Coding</div>
+                      <div className="stage-status">
+                        {job.completion_status?.coding ? 'Completed' : 'Pending'}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={`interview-stage ${job.completion_status?.hr ? 'completed' : 'pending'}`}>
+                    <div className="stage-icon">
+                      {job.completion_status?.hr ? (
+                        <CheckCircle size={14} />
+                      ) : (
+                        <XCircle size={14} />
+                      )}
+                    </div>
+                    <div className="stage-info">
+                      <div className="stage-name">HR Interview</div>
+                      <div className="stage-status">
+                        {job.completion_status?.hr ? 'Completed' : 'Pending'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center mt-4 pt-4 border-t border-[#e5e5e7]">
+                  <div className="application-date">
+                    Applied on: {job.applicationDate || new Date().toLocaleDateString()}
+                  </div>
+
+                  <button
+                    onClick={() => navigate(`/ai-hr-interview/${encodeURIComponent(job.recruiter_email)}`)}
+                    className="btn btn-secondary"
+                  >
+                    {props.calculateProgress(job.completion_status) === 100 ? 'View Details' : 'Continue Process'}
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="empty-state animate-fade-in">
+              <div className="flex justify-center mb-4">
+                <Briefcase size={48} className="text-[#a7a7a7]" />
+              </div>
+              <h3 className="empty-title">No Applications Yet</h3>
+              <p className="empty-description">
+                You haven't applied to any jobs yet. Browse our selected jobs and start applying!
+              </p>
+              <button
+                onClick={() => navigate("/jobs")}
+                className="empty-action-btn"
+              >
+                Browse Jobs
+              </button>
             </div>
-            <h3 className="empty-title">No Applications Yet</h3>
-            <p className="empty-description">
-              You haven't applied to any jobs yet. Browse our selected jobs and start applying!
-            </p>
-            <button
-              onClick={() => navigate("/jobs")}
-              className="empty-action-btn"
-            >
-              Browse Jobs
-            </button>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

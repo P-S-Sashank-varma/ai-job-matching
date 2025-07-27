@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "../styles/Home.css";
-import { motion } from "framer-motion";
-import dev1Image from "../images/pf2.jpeg";
-import dev2Image from "../images/kumar.png";
-import dev3Image from "../images/mani4.jpeg";
-import dev4Image from "../images/bhaskar.png";
+import heroImage from "../images/homepage.jpg"
 import { 
   Search, 
   FileText, 
@@ -16,8 +12,6 @@ import {
   Twitter, 
   Instagram, 
   ArrowUp,
-  Linkedin,
-  Github,
   Mail
 } from "lucide-react";
 
@@ -62,41 +56,6 @@ function Home() {
     });
   };
 
-  // Team members data
-  const teamMembers = [
-    {
-      name: "Sashank Varma",
-      role: "Frontend Developer",
-      image: dev1Image,
-      linkedin: "#",
-      github: "#",
-      email: "sashank@example.com"
-    },
-    {
-      name: "Prasanna Kumar",
-      role: "Backend Developer",
-      image:dev2Image,
-      linkedin: "#",
-      github: "#",
-      email: "prasanna@example.com"
-    },
-    {
-      name: "Devi Manikanta",
-      role: "AI Engineer",
-      image: dev3Image,
-      linkedin: "#",
-      github: "#",
-      email: "devi@example.com"
-    },
-    {
-      name: "Bhaskar Reddy",
-      role: "UX Designer",
-      image: dev4Image,
-      linkedin: "#",
-      github: "#",
-      email: "bhaskar@example.com"
-    }
-  ];
 
   // Features data
   const features = [
@@ -156,7 +115,7 @@ function Home() {
                 Leverage the power of artificial intelligence to match your skills with the perfect job opportunities and let our AI apply for them on your behalf.
               </p>
               <div className="hero-buttons">
-                <Link to="/signup" className="primary-button">
+                <Link to="/signup" className="secondary-button">
                   Get Started
                   <ArrowRight className="button-icon" />
                 </Link>
@@ -168,7 +127,7 @@ function Home() {
             
             <div className="hero-image-container">
               <img 
-                src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d" 
+                src={heroImage} 
                 alt="Person using laptop with AI job matching" 
                 className="hero-realistic-image"
               />
@@ -303,42 +262,7 @@ function Home() {
           </div>
         </section>
 
-        {/* Team Section */}
-        <section className="team-section">
-          <div className="container">
-            <div className="section-header">
-              <h2 className="section-title">Meet Our Team</h2>
-              <p className="section-subtitle">
-                The talented people behind our innovative AI-powered job matching platform
-              </p>
-            </div>
-
-            <div className="team-grid">
-              {teamMembers.map((member, index) => (
-                <div key={index} className="team-card scroll-reveal">
-                  <div className="team-image-container">
-                    <img src={member.image} alt={member.name} className="team-image" />
-                  </div>
-                  <div className="team-details">
-                    <h3 className="team-name">{member.name}</h3>
-                    <p className="team-role">{member.role}</p>
-                    <div className="team-social">
-                      <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="social-link linkedin">
-                        <Linkedin className="social-icon" />
-                      </a>
-                      <a href={member.github} target="_blank" rel="noopener noreferrer" className="social-link github">
-                        <Github className="social-icon" />
-                      </a>
-                      <a href={`mailto:${member.email}`} className="social-link email">
-                        <Mail className="social-icon" />
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+       
       </main>
 
       {/* Footer */}

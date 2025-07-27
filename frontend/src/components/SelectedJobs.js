@@ -8,10 +8,10 @@ const SelectedJobs = () => {
   const [loading, setLoading] = useState(true);
   const [userEmail, setUserEmail] = useState("");
   const [completionStatus, setCompletionStatus] = useState({});
-  
+
   const navigate = useNavigate();
 
-  // Get logged-in user info from token
+  // Decode user email from JWT
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -22,57 +22,55 @@ const SelectedJobs = () => {
         console.error("Error decoding token:", error);
       }
     }
-    
-    // Load completion status for all jobs
-    const storedData = JSON.parse(localStorage.getItem("completionStatus") || "{}");
-    setCompletionStatus(storedData);
+
+    // Load round completion status from local storage
+    const storedStatus = JSON.parse(localStorage.getItem("completionStatus") || "{}");
+    setCompletionStatus(storedStatus);
   }, []);
 
-  // Fetch selected jobs after getting user email
+  // Fetch matching jobs once email is available
   useEffect(() => {
     if (!userEmail) return;
 
-    const fetchSelectedJobs = async () => {
+    const fetchJobs = async () => {
       try {
         const token = localStorage.getItem("token");
-        if (!token) throw new Error("No authentication token found. Please log in.");
+        if (!token) throw new Error("No token found");
 
-        const response = await fetch(`http://127.0.0.1:8000/matching-jobs/${userEmail}`, {
+        const res = await fetch(`http://127.0.0.1:8000/matching-jobs/${userEmail}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (!response.ok) throw new Error("Failed to fetch selected jobs");
+        if (!res.ok) throw new Error("Failed to fetch jobs");
 
-        const data = await response.json();
-        console.log("Fetched Data:", data);
-
-        if (!Array.isArray(data)) throw new Error("Invalid response format: Expected an array");
+        const data = await res.json();
+        if (!Array.isArray(data)) throw new Error("Unexpected data format");
 
         setMatchedJobs(data);
-      } catch (error) {
-        console.error("Error fetching selected jobs:", error);
+      } catch (err) {
+        console.error("Job fetch error:", err);
         setMatchedJobs([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchSelectedJobs();
+    fetchJobs();
   }, [userEmail]);
 
-  // Helper function to check if all rounds are completed for a job
+  // Check if all rounds are done
   const getAllRoundsCompleted = (recruiterEmail) => {
-    const jobStatus = completionStatus[recruiterEmail];
-    return jobStatus && jobStatus.aptitude && jobStatus.coding && jobStatus.hr;
+    const status = completionStatus[recruiterEmail];
+    return status && status.aptitude && status.coding && status.hr;
   };
 
-  // Helper function to count completed rounds for a job
+  // Count how many rounds are completed
   const getCompletedRoundsCount = (recruiterEmail) => {
-    const jobStatus = completionStatus[recruiterEmail] || {};
+    const status = completionStatus[recruiterEmail] || {};
     let count = 0;
-    if (jobStatus.aptitude) count++;
-    if (jobStatus.coding) count++;
-    if (jobStatus.hr) count++;
+    if (status.aptitude) count++;
+    if (status.coding) count++;
+    if (status.hr) count++;
     return count;
   };
 
@@ -87,39 +85,46 @@ const SelectedJobs = () => {
       ) : (
         <div className="job-list">
           {matchedJobs.map((job, index) => {
-            // Dynamically extract recruiter email
             const recruiterEmail =
-              job.recruiter_email || job.email || job.recruiterEmail || "Not available";
-            
-            // Get completion status for this job
+              job.recruiter_email || job.email || job.recruiterEmail || "N/A";
+
             const completedRounds = getCompletedRoundsCount(recruiterEmail);
             const allCompleted = getAllRoundsCompleted(recruiterEmail);
 
             return (
-              <div key={index} className={`job-card ${allCompleted ? 'completed-job' : ''}`}>
-                <img src={job.company_image_url} alt="Company Logo" className="company-logo" />
+              <div
+                key={index}
+                className={`job-card ${allCompleted ? "completed-job" : ""}`}
+              >
+                <img
+                  src={job.company_image_url || "/default-logo.png"}
+                  alt="Company Logo"
+                  className="company-logo"
+                  onError={(e) => (e.target.src = "/default-logo.png")}
+                />
+
                 <div className="job-info">
-                  <h3>{job.company}</h3>
-                  <p><strong>Recruiter:</strong> {job.recruiter_name}</p>
+                  <h3>{job.company || "Unknown Company"}</h3>
+                  <p><strong>Recruiter:</strong> {job.recruiter_name || "N/A"}</p>
                   <p><strong>Skills Matched:</strong> {job.matched_skills?.join(", ") || "N/A"}</p>
-                  <p><strong>Match Percentage:</strong> {job.match_percentage || "0"}%</p>
+                  <p><strong>Match Percentage:</strong> {job.match_percentage || 0}%</p>
                   <p><strong>Recruiter Email:</strong> {recruiterEmail}</p>
-                  
+
                   <div className="job-status">
                     <div className="progress-indicator">
                       <div className="progress-text">
-                        {allCompleted 
-                          ? "All rounds completed!" 
+                        {allCompleted
+                          ? "All rounds completed!"
                           : `${completedRounds}/3 rounds completed`}
                       </div>
                       <div className="progress-bar">
-                        <div 
-                          className="progress-fill" 
+                        <div
+                          className="progress-fill"
                           style={{ width: `${(completedRounds / 3) * 100}%` }}
                         ></div>
                       </div>
                     </div>
-                    
+
                     <button
                       onClick={() =>
                         navigate(`/ai-hr-interview/${encodeURIComponent(recruiterEmail)}`)

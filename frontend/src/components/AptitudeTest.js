@@ -1,5 +1,8 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+import { updateRoundStatus } from "../services/api";
 import "../styles/Aptitude.css";
 
 // 10 Aptitude Questions
@@ -29,7 +32,21 @@ function Aptitude() {
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(10 * 60); // 10 minutes total
   const [completed, setCompleted] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
   const navigate = useNavigate();
+
+  // Get user email from token
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        setUserEmail(decodedToken.email);
+      } catch (error) {
+        console.error("Error decoding token:", error);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     setQuestions(getRandomQuestions());
@@ -44,16 +61,12 @@ function Aptitude() {
   }, [timeLeft]);
 
   useEffect(() => {
-    if (completed && score >= questions.length * 0.7) {
-      // Mark aptitude test as completed in localStorage for this specific recruiter
-      const completionData = JSON.parse(localStorage.getItem("completionStatus") || "{}");
-      if (!completionData[recruiterEmail]) {
-        completionData[recruiterEmail] = {};
-      }
-      completionData[recruiterEmail].aptitude = true;
-      localStorage.setItem("completionStatus", JSON.stringify(completionData));
+    if (completed && score >= questions.length * 0.7 && userEmail) {
+      // Mark aptitude test as completed in backend for this specific recruiter
+      updateRoundStatus(userEmail, recruiterEmail, "aptitude", true)
+        .catch(error => console.error("Error updating aptitude status:", error));
     }
-  }, [completed, score, questions.length, recruiterEmail]);
+  }, [completed, score, questions.length, recruiterEmail, userEmail]);
 
   if (questions.length === 0) return <div className="loading">Loading Questions...</div>;
 

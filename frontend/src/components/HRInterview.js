@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import emailjs from "@emailjs/browser";
+import { fetchSpecificJobStatus, updateRoundStatus } from "../services/api";
 import "../styles/HRInterview.css";
 import { CheckCircle } from "lucide-react";
 
@@ -11,6 +13,14 @@ const HRInterview = ({ userName }) => {
     : localStorage.getItem("currentRecruiterEmail") || "Unknown";
 
   const navigate = useNavigate();
+
+  const [userEmail, setUserEmail] = useState("");
+  const [completionData, setCompletionData] = useState({
+    aptitude: false,
+    coding: false,
+    hr: false,
+  });
+  const [statusUpdated, setStatusUpdated] = useState(false); // ✅ added toggle to force refresh
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState([]);
@@ -18,46 +28,67 @@ const HRInterview = ({ userName }) => {
   const [evaluating, setEvaluating] = useState(false);
   const [skills, setSkills] = useState("");
   const [loading, setLoading] = useState(false);
-  const [candidateEmail, setCandidateEmail] = useState("");
   const [showInterview, setShowInterview] = useState(false);
-  
-  // Get completion status for this specific recruiter
-  const [completionData, setCompletionData] = useState({});
 
   useEffect(() => {
-    // Store the current recruiter email in localStorage
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        setUserEmail(decodedToken.email);
+        console.log("Decoded user email:", decodedToken.email);
+      } catch (error) {
+        console.error("Error decoding token:", error);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     if (recruiterEmail) {
       localStorage.setItem("currentRecruiterEmail", decodedRecruiterEmail);
     }
-    
-    // Load completion data for this specific recruiter
-    const storedData = JSON.parse(localStorage.getItem("completionStatus") || "{}");
-    const recruiterData = storedData[decodedRecruiterEmail] || {};
-    setCompletionData(recruiterData);
-  }, [decodedRecruiterEmail, recruiterEmail]);
+  }, [recruiterEmail, decodedRecruiterEmail]);
 
-  // Function to update completion status
-  const updateCompletionStatus = (round, isCompleted) => {
-    const storedData = JSON.parse(localStorage.getItem("completionStatus") || "{}");
-    if (!storedData[decodedRecruiterEmail]) {
-      storedData[decodedRecruiterEmail] = {};
+  useEffect(() => {
+    const fetchJobStatus = async () => {
+      if (!userEmail || !decodedRecruiterEmail) return;
+      try {
+        console.log("Fetching job status for:", userEmail, decodedRecruiterEmail);
+        const status = await fetchSpecificJobStatus(userEmail, decodedRecruiterEmail);
+        console.log("Fetched job status from backend:", status);
+        setCompletionData(status?.completion_status || {});
+      } catch (error) {
+        console.error("Error fetching job status:", error);
+      }
+    };
+
+    fetchJobStatus();
+  }, [userEmail, decodedRecruiterEmail, statusUpdated]); // ✅ re-fetch when statusUpdated changes
+
+  const updateCompletionStatus = async (round, isCompleted) => {
+    if (!userEmail || !decodedRecruiterEmail) return;
+
+    console.log("Updating round status...");
+    console.log("Round:", round);
+    console.log("Is Completed:", isCompleted);
+    console.log("User Email:", userEmail);
+    console.log("Recruiter Email:", decodedRecruiterEmail);
+
+    try {
+      await updateRoundStatus(userEmail, decodedRecruiterEmail, round, isCompleted);
+      const updatedStatus = await fetchSpecificJobStatus(userEmail, decodedRecruiterEmail);
+      console.log("✅ Status after update:", updatedStatus);
+      setCompletionData(updatedStatus?.completion_status || {});
+      setStatusUpdated(prev => !prev); // ✅ trigger re-render
+    } catch (error) {
+      console.error("Error updating completion status:", error);
     }
-    storedData[decodedRecruiterEmail][round] = isCompleted;
-    localStorage.setItem("completionStatus", JSON.stringify(storedData));
-    
-    // Update local state
-    setCompletionData(prev => ({
-      ...prev,
-      [round]: isCompleted
-    }));
   };
 
-  // Check if all rounds are completed
   const checkAllRoundsCompleted = () => {
     return completionData.aptitude && completionData.coding && completionData.hr;
   };
 
-  // Function to fetch questions
   const fetchQuestions = async () => {
     setLoading(true);
     try {
@@ -81,7 +112,6 @@ const HRInterview = ({ userName }) => {
     }
   };
 
-  // Move to the next question or finish the interview
   const handleNextQuestion = () => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
@@ -90,14 +120,12 @@ const HRInterview = ({ userName }) => {
     }
   };
 
-  // Handle answer input
   const handleAnswerChange = (e) => {
     const newAnswers = [...answers];
     newAnswers[currentQuestionIndex] = e.target.value;
     setAnswers(newAnswers);
   };
 
-  // Evaluate Answers
   const evaluateAnswers = async () => {
     setEvaluating(true);
     try {
@@ -120,13 +148,11 @@ const HRInterview = ({ userName }) => {
       const finalScore = Math.round(totalScore / questions.length);
       setScore(finalScore);
 
-      // Update the HR interview completion status
       if (finalScore >= 0) {
-        updateCompletionStatus("hr", true);
+        await updateCompletionStatus("hr", true); // ✅ update backend and re-fetch
       }
 
-      // Send email only if score is evaluated
-      if (finalScore >= 0 && candidateEmail.trim() !== "") {
+      if (finalScore >= 0 && userEmail.trim() !== "") {
         sendEmail(finalScore);
       }
     } catch (err) {
@@ -136,7 +162,6 @@ const HRInterview = ({ userName }) => {
     }
   };
 
-  // Send interview result to recruiter
   const sendEmail = (finalScore) => {
     const serviceID = "service_2muq5z7";
     const templateID = "template_saz9rem";
@@ -146,11 +171,10 @@ const HRInterview = ({ userName }) => {
       to_email: decodedRecruiterEmail,
       from_name: "Smart Hire AI",
       reply_to: "virushka679@gmail.com",
-      message: `The candidate has completed the AI HR interview with a score of ${finalScore}/10.\n\nCandidate Email: ${candidateEmail}\n\nThis assessment was conducted through the AI Job Matching Portal, ensuring an efficient and unbiased evaluation process.`,
+      message: `The candidate has completed the AI HR interview with a score of ${finalScore}/10.\n\nCandidate Email: ${userEmail}\n\nThis assessment was conducted through the AI Job Matching Portal.`,
     };
 
-    emailjs
-      .send(serviceID, templateID, templateParams, publicKey)
+    emailjs.send(serviceID, templateID, templateParams, publicKey)
       .then((response) => {
         console.log("✅ Email sent successfully!", response);
       })
@@ -159,18 +183,9 @@ const HRInterview = ({ userName }) => {
       });
   };
 
-  const goToAptitude = () => {
-    navigate(`/aptitude`);
-  };
-
-  const goToCoding = () => {
-    navigate(`/codinground`);
-  };
-
-  // Function to navigate to selected jobs
-  const goToSelectedJobs = () => {
-    navigate("/selectedjobs");
-  };
+  const goToAptitude = () => navigate(`/aptitude`);
+  const goToCoding = () => navigate(`/codinground`);
+  const goToSelectedJobs = () => navigate("/selected-jobs");
 
   return (
     <div className="main-container">
@@ -258,7 +273,7 @@ const HRInterview = ({ userName }) => {
                     <div className="interview-setup">
                       <h3>Interview Setup</h3>
                       <p className="instruction">
-                        Enter your skills and email to generate personalized interview questions:
+                        Enter your skills to generate personalized interview questions:
                       </p>
                       <div className="input-group">
                         <input
@@ -267,15 +282,6 @@ const HRInterview = ({ userName }) => {
                           onChange={(e) => setSkills(e.target.value)}
                           placeholder="e.g., Python, React, Machine Learning"
                           className="skills-input"
-                        />
-                      </div>
-                      <div className="input-group">
-                        <input
-                          type="email"
-                          value={candidateEmail}
-                          onChange={(e) => setCandidateEmail(e.target.value)}
-                          placeholder="Enter Your Email"
-                          className="email-input"
                         />
                       </div>
                       <button

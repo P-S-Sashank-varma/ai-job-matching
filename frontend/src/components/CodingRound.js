@@ -1,7 +1,10 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import Editor from "@monaco-editor/react";
 import axios from "axios";
+import { updateRoundStatus } from "../services/api";
 import "../styles/CodingRound.css";
 
 // Question Bank (5 Questions)
@@ -81,7 +84,21 @@ function CodingRound() {
   const [score, setScore] = useState(0);
   const [completed, setCompleted] = useState(false);
   const [timeLeft, setTimeLeft] = useState(15 * 60);
+  const [userEmail, setUserEmail] = useState("");
   const navigate = useNavigate();
+
+  // Get user email from token
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        setUserEmail(decodedToken.email);
+      } catch (error) {
+        console.error("Error decoding token:", error);
+      }
+    }
+  }, []);
 
   // Load 3 Random Questions on Every Page Load
   useEffect(() => {
@@ -95,18 +112,14 @@ function CodingRound() {
     return () => clearInterval(timer);
   }, [timeLeft]);
 
-  // Save completion status to localStorage when completed
+  // Save completion status to backend when completed
   useEffect(() => {
-    if (completed && score >= 5) {
-      // Store completion status for this specific recruiter
-      const completionData = JSON.parse(localStorage.getItem("completionStatus") || "{}");
-      if (!completionData[recruiterEmail]) {
-        completionData[recruiterEmail] = {};
-      }
-      completionData[recruiterEmail].coding = true;
-      localStorage.setItem("completionStatus", JSON.stringify(completionData));
+    if (completed && score >= 5 && userEmail) {
+      // Store completion status in backend
+      updateRoundStatus(userEmail, recruiterEmail, "coding", true)
+        .catch(error => console.error("Error updating coding status:", error));
     }
-  }, [completed, score, recruiterEmail]);
+  }, [completed, score, userEmail, recruiterEmail]);
 
   if (questions.length === 0) {
     return (
