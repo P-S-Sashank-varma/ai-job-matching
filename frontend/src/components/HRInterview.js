@@ -92,7 +92,7 @@ const HRInterview = ({ userName }) => {
   const fetchQuestions = async () => {
     setLoading(true);
     try {
-      const response = await fetch("http://127.0.0.1:8000/generate_questions", {
+      const response = await fetch("https://ai-job-matching-1w6g.onrender.com/generate_questions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ skills: skills.split(",").map((s) => s.trim()) }),
@@ -133,7 +133,7 @@ const HRInterview = ({ userName }) => {
       for (let i = 0; i < questions.length; i++) {
         if (!answers[i]) continue;
 
-        const response = await fetch("http://localhost:8000/evaluate_answer", {
+        const response = await fetch("https://ai-job-matching-1w6g.onrender.com/evaluate_answer", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ question: questions[i], answer: answers[i] || "No answer provided" }),
