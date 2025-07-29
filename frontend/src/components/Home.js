@@ -17,6 +17,7 @@ import {
 
 function Home() {
   const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   useEffect(() => {
     // Navbar scroll effect
@@ -87,16 +88,19 @@ function Home() {
           <Link to="/" className="logo">
             <span className="logo-text">SmartHire AI</span>
           </Link>
-          
-          <nav className="nav-menu">
-            <Link to="/" className="nav-link">Home</Link>
-            <Link to="/jobs" className="nav-link">Jobs</Link>
-            <Link to="/contact" className="nav-link">Contact</Link>
+          <button className="hamburger" onClick={() => setMobileMenuOpen(v => !v)} aria-label="Toggle menu">
+            <span className="hamburger-bar"></span>
+            <span className="hamburger-bar"></span>
+            <span className="hamburger-bar"></span>
+          </button>
+          <nav className={`nav-menu${mobileMenuOpen ? " open" : ""}`}>
+            <Link to="/" className="nav-link" onClick={() => setMobileMenuOpen(false)}>Home</Link>
+            <Link to="/jobs" className="nav-link" onClick={() => setMobileMenuOpen(false)}>Jobs</Link>
+            <Link to="/contact" className="nav-link" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
           </nav>
-          
-          <div className="auth-buttons">
-            <Link to="/login" className="login-button">Log in</Link>
-            <Link to="/signup" className="signup-button">Sign up</Link>
+          <div className={`auth-buttons${mobileMenuOpen ? " open" : ""}`}>
+            <Link to="/login" className="login-button" onClick={() => setMobileMenuOpen(false)}>Log in</Link>
+            <Link to="/signup" className="signup-button" onClick={() => setMobileMenuOpen(false)}>Sign up</Link>
           </div>
         </div>
       </header>
