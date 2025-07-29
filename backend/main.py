@@ -22,7 +22,7 @@ app = FastAPI()
 # ✅ Add CORS middleware RIGHT AFTER app creation
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Your React frontend
+    allow_origins=["https://ai-job-matching-kappa.vercel.app"],  # Your React frontend
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
