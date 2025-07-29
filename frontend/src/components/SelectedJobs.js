@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import "../styles/SelectedJobs.css";
 
@@ -10,6 +10,7 @@ const SelectedJobs = () => {
   const [completionStatus, setCompletionStatus] = useState({});
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Decode user email from JWT
   useEffect(() => {
@@ -28,11 +29,32 @@ const SelectedJobs = () => {
     setCompletionStatus(storedStatus);
   }, []);
 
+  // Reload completionStatus from localStorage when page becomes visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        const storedStatus = JSON.parse(localStorage.getItem("completionStatus") || "{}");
+        setCompletionStatus(storedStatus);
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
+
+  // Reload completionStatus from localStorage when route changes
+  useEffect(() => {
+    const storedStatus = JSON.parse(localStorage.getItem("completionStatus") || "{}");
+    setCompletionStatus(storedStatus);
+  }, [location]);
+
   // Fetch matching jobs once email is available
   useEffect(() => {
     if (!userEmail) return;
 
-    const fetchJobs = async () => {
+    const fetchJobsAndStatuses = async () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No token found");
@@ -46,7 +68,26 @@ const SelectedJobs = () => {
         const data = await res.json();
         if (!Array.isArray(data)) throw new Error("Unexpected data format");
 
-        setMatchedJobs(data);
+        // For each job, fetch the completion status
+        const jobsWithStatus = await Promise.all(
+          data.map(async (job) => {
+            const recruiterEmail = job.recruiter_email || job.email || job.recruiterEmail;
+            if (!recruiterEmail) return { ...job, completion_status: {} };
+            try {
+              const statusRes = await fetch(
+                `http://127.0.0.1:8000/api/job-status/${userEmail}/${recruiterEmail}`,
+                { headers: { Authorization: `Bearer ${token}` } }
+              );
+              if (!statusRes.ok) return { ...job, completion_status: {} };
+              const statusData = await statusRes.json();
+              return { ...job, completion_status: statusData.completion_status || {} };
+            } catch {
+              return { ...job, completion_status: {} };
+            }
+          })
+        );
+
+        setMatchedJobs(jobsWithStatus);
       } catch (err) {
         console.error("Job fetch error:", err);
         setMatchedJobs([]);
@@ -55,18 +96,18 @@ const SelectedJobs = () => {
       }
     };
 
-    fetchJobs();
+    fetchJobsAndStatuses();
   }, [userEmail]);
 
   // Check if all rounds are done
-  const getAllRoundsCompleted = (recruiterEmail) => {
-    const status = completionStatus[recruiterEmail];
-    return status && status.aptitude && status.coding && status.hr;
+  const getAllRoundsCompleted = (job) => {
+    const status = job.completion_status || {};
+    return status.aptitude && status.coding && status.hr;
   };
 
   // Count how many rounds are completed
-  const getCompletedRoundsCount = (recruiterEmail) => {
-    const status = completionStatus[recruiterEmail] || {};
+  const getCompletedRoundsCount = (job) => {
+    const status = job.completion_status || {};
     let count = 0;
     if (status.aptitude) count++;
     if (status.coding) count++;
@@ -88,8 +129,8 @@ const SelectedJobs = () => {
             const recruiterEmail =
               job.recruiter_email || job.email || job.recruiterEmail || "N/A";
 
-            const completedRounds = getCompletedRoundsCount(recruiterEmail);
-            const allCompleted = getAllRoundsCompleted(recruiterEmail);
+            const completedRounds = getCompletedRoundsCount(job);
+            const allCompleted = getAllRoundsCompleted(job);
 
             return (
               <div

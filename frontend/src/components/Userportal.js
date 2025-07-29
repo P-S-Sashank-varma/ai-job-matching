@@ -67,6 +67,11 @@ function UserPortal() {
     }
   }, [activeTab, location.pathname]);
 
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/login");
+  };
+
   const tabProps = {
     name, setName,
     email,
@@ -97,6 +102,7 @@ function UserPortal() {
             <User size={16} />
           </div>
           <span className="username">{email || "User"}</span>
+          <button onClick={handleLogout} className="btn btn-primary" style={{marginLeft: '1rem'}}>Logout</button>
         </div>
       </nav>
 

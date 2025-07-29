@@ -16,6 +16,7 @@ import {
   decodeToken,
   fetchRecruiterProfile
 } from "./RecruiterDashboardAPI";
+import { useNavigate } from "react-router-dom";
 
 function RecruiterDashboard() {
   // State variables
@@ -49,6 +50,7 @@ function RecruiterDashboard() {
   
 
   const companyImageInputRef = useRef(null);
+  const navigate = useNavigate();
 
   // Initialize recruiter info from token on component mount
   useEffect(() => {
@@ -197,6 +199,11 @@ function RecruiterDashboard() {
     );
   };
 
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/login");
+  };
+
   return (
     <div className="recruiter-dashboard">
       <div className="dashboard-header">
@@ -290,6 +297,7 @@ function RecruiterDashboard() {
           />
         )}
       </div>
+      <button onClick={handleLogout} style={{position: 'absolute', top: 20, right: 20, padding: '8px 18px', background: '#5b7fff', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 600, cursor: 'pointer'}}>Logout</button>
     </div>
   );
 }
