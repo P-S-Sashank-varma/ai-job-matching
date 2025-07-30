@@ -11,6 +11,7 @@ from fastapi import Form
 from datetime import datetime
 from bson import ObjectId
 from routes import job_status
+from fastapi import Response
 
 
 # ✅ Load environment variables
@@ -22,7 +23,7 @@ app = FastAPI()
 # ✅ Add CORS middleware RIGHT AFTER app creation
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://ai-job-matching-kappa.vercel.app"],  # Your React frontend
+    allow_origins=["*"],  # Allow all origins for debugging; change back in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -206,4 +207,11 @@ async def get_all_drives():
 @app.get("/")
 async def read_root():
     return {"message": "✅ FastAPI - AI HR Interview System is running!"}
+
+@app.options("/login")
+async def options_login(response: Response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    return Response(status_code=204)
 
