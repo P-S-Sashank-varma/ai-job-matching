@@ -18,7 +18,10 @@ else:
     client = AsyncIOMotorClient(MONGO_URL)
 
 # Connect to 'SkillSync' database (Atlas URL should include it, but ensure fallback here)
-db = client.get_default_database() or client["SkillSync"]
+db = client.get_default_database()
+if db is None:
+    db = client["SkillSync"]
+
 
 # Define collection references
 user_dashboard_collection = db["user_dashboard"]
