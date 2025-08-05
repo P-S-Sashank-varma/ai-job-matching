@@ -3,6 +3,10 @@ An AI-powered job matching portal built with React.js (frontend) and FastAPI (ba
 
 🧠 Features
 🔍 Smart Job Matching
+<img width="1889" height="856" alt="Screenshot (89)" src="https://github.com/user-attachments/assets/c03bc0b0-504f-4b3f-8019-d86ee313dce1" />
+<img width="1902" height="839" alt="Screenshot (87)" src="https://github.com/user-attachments/assets/87ff2471-f35c-4f2e-b505-eb215f70869a" />
+<img width="1902" height="839" alt="Screenshot (87)" src="https://github.com/user-attachments/assets/44489506-90c0-49b3-ac51-c5aee5f63888" />
+
 Automatically matches uploaded resumes with relevant job listings based on an 80% skill match threshold.
 
 📄 AI Resume Parsing
