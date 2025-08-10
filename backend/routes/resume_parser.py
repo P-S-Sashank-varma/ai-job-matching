@@ -8,9 +8,12 @@ from database import user_dashboard_collection
 
 router = APIRouter()
 
-# ✅ Manually Set Resume Directory (Ensures Correct Path) - Unchanged
-RESUME_DIR = r"C:\Users\sasha\Desktop\ai-job-matching\backend\uploads\resumes"
-os.makedirs(RESUME_DIR, exist_ok=True)  # Ensure directory exists
+# ✅ Resolve resume directory relative to backend and routes directories
+BACKEND_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+RESUME_DIR_BACKEND = os.path.join(BACKEND_DIR, "uploads", "resumes")
+RESUME_DIR_ROUTES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uploads", "resumes")
+for _path in [RESUME_DIR_BACKEND, RESUME_DIR_ROUTES]:
+    os.makedirs(_path, exist_ok=True)
 
 # ✅ Define Skills List - Unchanged
 SKILL_SET = {
@@ -84,9 +87,26 @@ def extract_text_from_docx(docx_path):
     return docx2txt.process(docx_path)
 
 # ✅ Extract Skills Without Using NLP Libraries - Unchanged
-def extract_skills(text):
-    words = set(re.findall(r"\b\w+\b", text.lower()))  # Tokenize words
-    return list(SKILL_SET.intersection(words))
+def _normalize(s: str) -> str:
+    return re.sub(r"[^a-z0-9]", "", s.lower())
+
+def extract_skills(text: str):
+    # Normalize text for robust matching (handles dots/spaces like react.js, machine learning)
+    text_lower = text.lower()
+    text_compact = _normalize(text_lower)
+    found = set()
+    for skill in SKILL_SET:
+        norm_skill = _normalize(skill)
+        if not norm_skill:
+            continue
+        if norm_skill in text_compact:
+            found.add(skill)
+            continue
+        # Fallback token-based match for single-word skills
+        if " " not in skill and "." not in skill:
+            if re.search(rf"\b{re.escape(skill.lower())}\b", text_lower):
+                found.add(skill)
+    return list(found)
 
 # ✅ Extract Experience - Unchanged
 def extract_experience(text):
@@ -117,28 +137,33 @@ async def parse_user_resume(email: str):
     if not user or "resume_filename" not in user:
         raise HTTPException(status_code=404, detail="Resume not found for this user")
 
-    resume_filename = user["resume_filename"]
-    
-    # ✅ Manually Construct Correct Resume Path - Unchanged
-    resume_path = os.path.join(RESUME_DIR, resume_filename)
-    resume_path = os.path.abspath(resume_path)  # Ensure absolute path
+    # Prefer the exact stored path if available
+    resume_path = user.get("resume_path")
+    if not resume_path or not os.path.exists(resume_path):
+        resume_filename = user["resume_filename"]
+        # Try both backend-level and routes-level upload directories
+        candidate_paths = [
+            os.path.abspath(os.path.join(RESUME_DIR_BACKEND, resume_filename)),
+            os.path.abspath(os.path.join(RESUME_DIR_ROUTES, resume_filename)),
+        ]
+        resume_path = next((p for p in candidate_paths if os.path.exists(p)), None)
 
-    print(f"Checking file at: {resume_path}")  # Debugging output
-
-    if not os.path.exists(resume_path):
+    if not resume_path or not os.path.exists(resume_path):
         raise HTTPException(status_code=404, detail="Resume file not found on the server")
 
-    file_type = "pdf" if resume_filename.lower().endswith(".pdf") else "docx"
+    file_type = "pdf" if resume_path.lower().endswith(".pdf") else "docx"
     parsed_data = parse_resume(resume_path, file_type)
 
-    # ✅ **NEW: Update Extracted Skills & Experience in MongoDB**
+    # ✅ Update extracted skills & experience in MongoDB
     await user_dashboard_collection.update_one(
         {"email": email},
-        {"$set": {"skills": parsed_data["skills"], "experience": parsed_data["experience"]}}
+        {"$set": {"skills": parsed_data["skills"], "experience": parsed_data["experience"]}},
+        upsert=False,
     )
 
     return JSONResponse({
-        "email": email, 
-        "skills": parsed_data["skills"], 
-        "experience": parsed_data["experience"]
+        "email": email,
+        "skills": parsed_data["skills"],
+        "experience": parsed_data["experience"],
+        "resume_path": resume_path,
     })
