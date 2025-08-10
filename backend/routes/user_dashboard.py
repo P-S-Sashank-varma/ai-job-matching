@@ -55,7 +55,7 @@ async def get_user_dashboard(email: str):
         "email": user["email"],
         "phone": user["phone"],
         "resume_filename": user["resume_filename"],
-        "resume_url": f"http://localhost:8000/get-resume/{user['resume_filename']}"
+        "resume_url": f"https://ai-job-matching-zd8j.onrender.com/get-resume/{user['resume_filename']}"
     }
 
 

@@ -33,7 +33,7 @@ export const fetchJobs = async (recruiterEmail, setPostedJobs, setLoading) => {
     ];
 
     try {
-      const response = await fetch(`http://localhost:8000/recruiter-dashboard/${encodeURIComponent(recruiterEmail)}`, {
+      const response = await fetch(`https://ai-job-matching-zd8j.onrender.com/recruiter-dashboard/${encodeURIComponent(recruiterEmail)}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       
@@ -63,7 +63,7 @@ export const fetchDrives = async (recruiterEmail, setDrives, setLoadingDrives) =
     const token = localStorage.getItem("token") || "dummy-token";
     
     try {
-      const response = await fetch(`http://localhost:8000/drives/${encodeURIComponent(recruiterEmail)}`, {
+      const response = await fetch(`https://ai-job-matching-zd8j.onrender.com/drives/${encodeURIComponent(recruiterEmail)}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       
@@ -129,7 +129,7 @@ export const handleDeleteJob = async (jobId, setPostedJobs) => {
     const token = localStorage.getItem("token") || "dummy-token";
 
     try {
-      const response = await fetch(`http://localhost:8000/recruiter-dashboard/${jobId}`, {
+      const response = await fetch(`https://ai-job-matching-zd8j.onrender.com/recruiter-dashboard/${jobId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -160,7 +160,7 @@ export const handleDeleteDrive = async (driveId, setDrives) => {
     const token = localStorage.getItem("token") || "dummy-token";
 
     try {
-      const response = await fetch(`http://localhost:8000/drives/${driveId}`, {
+      const response = await fetch(`https://ai-job-matching-zd8j.onrender.com/drives/${driveId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -219,8 +219,8 @@ export const handleJobSubmit = async (
 
   try {
     const url = editingJobId
-      ? `http://localhost:8000/recruiter-dashboard/${editingJobId}`
-      : "http://localhost:8000/recruiter-dashboard";
+      ? `https://ai-job-matching-zd8j.onrender.com/recruiter-dashboard/${editingJobId}`
+      : "https://ai-job-matching-zd8j.onrender.com/recruiter-dashboard";
     const method = editingJobId ? "PUT" : "POST";
 
     try {
@@ -310,7 +310,7 @@ export const handleDriveSubmit = async (
     formData.append("recruiter_name", recruiterName);  // pass the actual name value
     formData.append("recruiter_email", recruiterEmail);  // pass the actual email value
 
-    const response = await fetch("http://localhost:8000/drives/", {
+    const response = await fetch("https://ai-job-matching-zd8j.onrender.com/drives/", {
       method: "POST",
       body: formData,
       headers: { Authorization: `Bearer ${token}` },
@@ -384,7 +384,7 @@ export const fetchRecruiterProfile = async (email) => {
     const token = localStorage.getItem("token") || "dummy-token";
     
     try {
-      const response = await fetch(`http://localhost:8000/recruiter-profile/${encodeURIComponent(email)}`, {
+      const response = await fetch(`https://ai-job-matching-zd8j.onrender.com/recruiter-profile/${encodeURIComponent(email)}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       

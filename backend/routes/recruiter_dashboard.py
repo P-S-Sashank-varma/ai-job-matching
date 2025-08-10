@@ -27,7 +27,7 @@ async def serialize_job(job):
         "location": job.get("location", "Not specified"),
         "match_percentage": job.get("match_percentage", "0%"),  # Default to 0% if not provided
         "company_image_filename": job["company_image_filename"],
-        "company_image_url": f"http://localhost:8000/get-company-image/{job['company_image_filename']}",
+        "company_image_url": f"https://ai-job-matching-zd8j.onrender.com/get-company-image/{job['company_image_filename']}",
     }
 
 
@@ -67,7 +67,7 @@ async def post_job(
             "location": location,
             "match_percentage": match_percentage,  # ✅ Ensure it's included
             "company_image_filename": image_filename,
-            "company_image_url": f"http://localhost:8000/get-company-image/{image_filename}",
+            "company_image_url": f"https://ai-job-matching-zd8j.onrender.com/get-company-image/{image_filename}",
         }
 
         print(f"Job data before insert: {job_data}")  # ✅ Debugging
@@ -185,7 +185,7 @@ async def update_job(
                 buffer.write(await company_image.read())
 
             updated_job_data["company_image_filename"] = image_filename
-            updated_job_data["company_image_url"] = f"http://localhost:8000/get-company-image/{image_filename}"
+            updated_job_data["company_image_url"] = f"https://ai-job-matching-zd8j.onrender.com/get-company-image/{image_filename}"
 
         # ✅ Update job in MongoDB
         await recruiter_dashboard_collection.update_one(

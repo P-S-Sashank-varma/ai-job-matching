@@ -59,7 +59,7 @@ const SelectedJobs = () => {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No token found");
 
-        const res = await fetch(`http://localhost:8000/matching-jobs/${userEmail}`, {
+        const res = await fetch(`https://ai-job-matching-zd8j.onrender.com/matching-jobs/${userEmail}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -75,7 +75,7 @@ const SelectedJobs = () => {
             if (!recruiterEmail) return { ...job, completion_status: {} };
             try {
               const statusRes = await fetch(
-                `http://localhost:8000/api/job-status/${userEmail}/${recruiterEmail}`,
+                `https://ai-job-matching-zd8j.onrender.com/api/job-status/${userEmail}/${recruiterEmail}`,
                 { headers: { Authorization: `Bearer ${token}` } }
               );
               if (!statusRes.ok) return { ...job, completion_status: {} };
