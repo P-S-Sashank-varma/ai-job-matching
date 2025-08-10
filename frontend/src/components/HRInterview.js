@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import emailjs from "@emailjs/browser";
@@ -30,6 +30,10 @@ const HRInterview = ({ userName }) => {
   const [loading, setLoading] = useState(false);
   const [showInterview, setShowInterview] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+  const [emailAlreadySent, setEmailAlreadySent] = useState(false);
+  const [emailSending, setEmailSending] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const autoSendGuardRef = useRef(false);
 
   // Local flag to ensure a single notification per user/recruiter pair on this device
   const getNotifyKey = (u, r) => `emailNotified:${u || ''}:${r || ''}`;
@@ -63,6 +67,7 @@ const HRInterview = ({ userName }) => {
         const status = await fetchSpecificJobStatus(userEmail, decodedRecruiterEmail);
         console.log("Fetched job status from backend:", status);
         setCompletionData(status?.completion_status || {});
+        setEmailAlreadySent(!!status?.all_rounds_completed_email_sent);
       } catch (error) {
         console.error("Error fetching job status:", error);
       }
@@ -173,6 +178,8 @@ const HRInterview = ({ userName }) => {
             } catch (e2) {
               console.error("Error marking backend notified flag:", e2);
             }
+          } else if (allDone && (backendAlreadySent || alreadySent)) {
+            setEmailAlreadySent(true);
           }
         } catch (e) {
           console.error("Error checking completion before email:", e);
@@ -194,19 +201,58 @@ const HRInterview = ({ userName }) => {
       to_email: decodedRecruiterEmail,
       from_name: "Smart Hire AI",
       reply_to: "virushka679@gmail.com",
-      message: `The candidate has completed the AI HR interview with a score of ${finalScore}/10.\n\nCandidate Email: ${userEmail}\n\nThis assessment was conducted through the AI Job Matching Portal.`,
+      message:
+        typeof finalScore === "number"
+          ? `The candidate has completed the AI HR interview with a score of ${finalScore}/10.\n\nCandidate Email: ${userEmail}\n\nThis assessment was conducted through the AI Job Matching Portal.`
+          : `The candidate has completed all interview rounds.\n\nCandidate Email: ${userEmail}\n\nThis notification was sent by Smart Hire AI.`,
     };
 
+    setEmailError("");
+    setEmailSending(true);
     emailjs
       .send(serviceID, templateID, templateParams, publicKey)
       .then((response) => {
         console.log("✅ Email sent successfully!", response);
         setEmailSent(true);
+        setEmailSending(false);
       })
       .catch((error) => {
         console.error("❌ Error sending email:", error);
+        setEmailError("Failed to send email. Please try again later.");
+        setEmailSending(false);
       });
   };
+
+  // Auto-check on mount/updates: if all rounds are already completed, send once if needed
+  useEffect(() => {
+    if (!userEmail || !decodedRecruiterEmail) return;
+    const allDone = checkAllRoundsCompleted();
+    if (!allDone) return;
+    if (autoSendGuardRef.current) return;
+
+    (async () => {
+      autoSendGuardRef.current = true;
+      try {
+        const refreshed = await fetchSpecificJobStatus(userEmail, decodedRecruiterEmail);
+        const backendAlreadySent = !!refreshed?.all_rounds_completed_email_sent;
+        const alreadySent = hasAlreadyNotified(userEmail, decodedRecruiterEmail);
+        if (backendAlreadySent || alreadySent) {
+          setEmailAlreadySent(true);
+          return;
+        }
+        // Not sent yet: send now and mark flags
+        sendEmail(undefined);
+        markNotified(userEmail, decodedRecruiterEmail);
+        try {
+          await markAllRoundsEmailSent(userEmail, decodedRecruiterEmail);
+        } catch (e2) {
+          console.error("Error marking backend notified flag:", e2);
+        }
+      } catch (e) {
+        console.error("Auto-send check failed:", e);
+      }
+    })();
+  }, [userEmail, decodedRecruiterEmail, completionData]);
 
   const goToAptitude = () => navigate(`/aptitude`);
   const goToCoding = () => navigate(`/codinground`);
@@ -368,7 +414,7 @@ const HRInterview = ({ userName }) => {
                            score >= 5 ? "Good job! Your application has been submitted." : 
                            "Thanks for completing the interview."}
                         </p>
-                        {emailSent && (
+                        {(emailSent || emailAlreadySent) && (
                           <div className="email-sent-banner" style={{
                             marginTop: "12px",
                             padding: "10px 12px",
@@ -377,7 +423,7 @@ const HRInterview = ({ userName }) => {
                             color: "#05612f",
                             border: "1px solid #b7f5c8"
                           }}>
-                            Email has been sent to the recruiter.
+                            {emailAlreadySent ? "Email has already been sent to the recruiter." : "Email has been sent to the recruiter."}
                           </div>
                         )}
 
