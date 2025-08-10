@@ -29,6 +29,12 @@ const HRInterview = ({ userName }) => {
   const [skills, setSkills] = useState("");
   const [loading, setLoading] = useState(false);
   const [showInterview, setShowInterview] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+
+  // Local flag to ensure a single notification per user/recruiter pair on this device
+  const getNotifyKey = (u, r) => `emailNotified:${u || ''}:${r || ''}`;
+  const hasAlreadyNotified = (u, r) => localStorage.getItem(getNotifyKey(u, r)) === 'true';
+  const markNotified = (u, r) => localStorage.setItem(getNotifyKey(u, r), 'true');
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -149,11 +155,22 @@ const HRInterview = ({ userName }) => {
       setScore(finalScore);
 
       if (finalScore >= 0) {
-        await updateCompletionStatus("hr", true); // ✅ update backend and re-fetch
-      }
+        // Mark HR as completed in backend
+        await updateCompletionStatus("hr", true);
 
-      if (finalScore >= 0 && userEmail.trim() !== "") {
-        sendEmail(finalScore);
+        // Re-fetch status to confirm all rounds are completed before sending email
+        try {
+          const refreshed = await fetchSpecificJobStatus(userEmail, decodedRecruiterEmail);
+          const status = refreshed?.completion_status || {};
+          const allDone = !!(status.aptitude && status.coding && status.hr);
+          const alreadySent = hasAlreadyNotified(userEmail, decodedRecruiterEmail);
+          if (allDone && !alreadySent && userEmail.trim() !== "") {
+            sendEmail(finalScore);
+            markNotified(userEmail, decodedRecruiterEmail);
+          }
+        } catch (e) {
+          console.error("Error checking completion before email:", e);
+        }
       }
     } catch (err) {
       console.error("Error evaluating answers:", err);
@@ -174,9 +191,11 @@ const HRInterview = ({ userName }) => {
       message: `The candidate has completed the AI HR interview with a score of ${finalScore}/10.\n\nCandidate Email: ${userEmail}\n\nThis assessment was conducted through the AI Job Matching Portal.`,
     };
 
-    emailjs.send(serviceID, templateID, templateParams, publicKey)
+    emailjs
+      .send(serviceID, templateID, templateParams, publicKey)
       .then((response) => {
         console.log("✅ Email sent successfully!", response);
+        setEmailSent(true);
       })
       .catch((error) => {
         console.error("❌ Error sending email:", error);
@@ -343,6 +362,19 @@ const HRInterview = ({ userName }) => {
                            score >= 5 ? "Good job! Your application has been submitted." : 
                            "Thanks for completing the interview."}
                         </p>
+                        {emailSent && (
+                          <div className="email-sent-banner" style={{
+                            marginTop: "12px",
+                            padding: "10px 12px",
+                            borderRadius: "6px",
+                            background: "#e6ffed",
+                            color: "#05612f",
+                            border: "1px solid #b7f5c8"
+                          }}>
+                            Email has been sent to the recruiter.
+                          </div>
+                        )}
+
                         <div className="post-interview-actions">
                           {checkAllRoundsCompleted() ? (
                             <button onClick={goToSelectedJobs} className="view-jobs-button">
