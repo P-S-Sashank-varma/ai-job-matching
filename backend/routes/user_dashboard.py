@@ -115,6 +115,14 @@ async def get_matching_jobs(email: str):
         match_percentage = (len(matched_skills) / len(job_skills)) * 100 if job_skills else 0
         
         if match_percentage >= 60:
+            # Always build the image URL from filename to avoid stale localhost links
+            image_filename = job.get("company_image_filename")
+            image_url = (
+                f"https://ai-job-matching-zd8j.onrender.com/get-company-image/{image_filename}"
+                if image_filename
+                else job.get("company_image_url")
+            )
+
             selected_jobs.append({
                 "id": str(job["_id"]),
                 "recruiter_name": job["recruiter_name"],
@@ -123,7 +131,7 @@ async def get_matching_jobs(email: str):
                 "skills_required": list(job_skills),
                 "matched_skills": list(matched_skills),
                 "match_percentage": round(match_percentage, 2),
-                "company_image_url": job["company_image_url"]
+                "company_image_url": image_url,
             })
     
     if not selected_jobs:

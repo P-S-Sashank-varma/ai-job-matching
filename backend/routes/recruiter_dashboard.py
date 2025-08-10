@@ -26,8 +26,11 @@ async def serialize_job(job):
         "job_location": job.get("job_location", "Not specified"),
         "location": job.get("location", "Not specified"),
         "match_percentage": job.get("match_percentage", "0%"),  # Default to 0% if not provided
-        "company_image_filename": job["company_image_filename"],
-        "company_image_url": f"https://ai-job-matching-zd8j.onrender.com/get-company-image/{job['company_image_filename']}",
+        "company_image_filename": job.get("company_image_filename"),
+        "company_image_url": (
+            f"https://ai-job-matching-zd8j.onrender.com/get-company-image/{job['company_image_filename']}"
+            if job.get("company_image_filename") else job.get("company_image_url")
+        ),
     }
 
 
