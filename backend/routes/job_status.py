@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import List,Optional,Dict
+from typing import List, Optional, Dict
 from bson import ObjectId
 from database import user_job_statuses_collection  # MongoDB collection
 from database import recruiter_dashboard_collection
@@ -26,6 +26,7 @@ class SimpleUserJobStatus(BaseModel):
     user_email: str
     recruiter_email: str
     completion_status: CompletionStatus
+    all_rounds_completed_email_sent: Optional[bool] = False
 
 
 
@@ -56,12 +57,16 @@ async def get_specific_job_status(user_email: str, recruiter_email: str):
 
     if record:
         record.pop("_id", None)
+        # Ensure the email-sent flag is present with a default
+        if "all_rounds_completed_email_sent" not in record:
+            record["all_rounds_completed_email_sent"] = False
         return record
 
     return SimpleUserJobStatus(
         user_email=user_email,
         recruiter_email=recruiter_email,
-        completion_status=CompletionStatus()
+        completion_status=CompletionStatus(),
+        all_rounds_completed_email_sent=False,
     )
 
 
@@ -99,6 +104,19 @@ async def update_round_status(user_email: str, recruiter_email: str, round_name:
         return {"message": f"{round_name} round status updated successfully"}
 
     raise HTTPException(status_code=500, detail="Failed to update round status")
+
+
+# Mark notification sent to avoid duplicate emails across devices
+@router.put("/job-status/{user_email}/{recruiter_email}/mark-notified")
+async def mark_all_rounds_email_sent(user_email: str, recruiter_email: str):
+    result = await user_job_statuses_collection.update_one(
+        {"user_email": user_email, "recruiter_email": recruiter_email},
+        {"$set": {"all_rounds_completed_email_sent": True}},
+        upsert=True,
+    )
+    if result.upserted_id or result.modified_count:
+        return {"message": "notification flag set"}
+    raise HTTPException(status_code=500, detail="Failed to set notification flag")
 
 
 

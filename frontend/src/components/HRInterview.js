@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import emailjs from "@emailjs/browser";
-import { fetchSpecificJobStatus, updateRoundStatus } from "../services/api";
+import { fetchSpecificJobStatus, updateRoundStatus, markAllRoundsEmailSent } from "../services/api";
 import "../styles/HRInterview.css";
 import { CheckCircle } from "lucide-react";
 
@@ -163,10 +163,16 @@ const HRInterview = ({ userName }) => {
           const refreshed = await fetchSpecificJobStatus(userEmail, decodedRecruiterEmail);
           const status = refreshed?.completion_status || {};
           const allDone = !!(status.aptitude && status.coding && status.hr);
+          const backendAlreadySent = !!refreshed?.all_rounds_completed_email_sent;
           const alreadySent = hasAlreadyNotified(userEmail, decodedRecruiterEmail);
-          if (allDone && !alreadySent && userEmail.trim() !== "") {
+          if (allDone && !backendAlreadySent && !alreadySent && userEmail.trim() !== "") {
             sendEmail(finalScore);
             markNotified(userEmail, decodedRecruiterEmail);
+            try {
+              await markAllRoundsEmailSent(userEmail, decodedRecruiterEmail);
+            } catch (e2) {
+              console.error("Error marking backend notified flag:", e2);
+            }
           }
         } catch (e) {
           console.error("Error checking completion before email:", e);

@@ -52,6 +52,18 @@ export const updateRoundStatus = async (userEmail, recruiterEmail, roundName, co
   }
 };
 
+export const markAllRoundsEmailSent = async (userEmail, recruiterEmail) => {
+  try {
+    const response = await axios.put(
+      `${API_URL}/job-status/${encodeURIComponent(userEmail)}/${encodeURIComponent(recruiterEmail)}/mark-notified`
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error marking notification flag:', error);
+    throw error;
+  }
+};
+
 export const fetchAppliedJobs = async (userEmail) => {
     try {
       // Fetch all job statuses for the given user email
