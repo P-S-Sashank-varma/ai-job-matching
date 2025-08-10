@@ -23,7 +23,10 @@ app = FastAPI()
 # ✅ Add CORS middleware RIGHT AFTER app creation
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Only allow local frontend
+    allow_origins=[
+        "http://localhost:3000",
+        "https://ai-job-matching-kappa.vercel.app",
+    ],  # Allow local frontend and deployed Vercel frontend
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
