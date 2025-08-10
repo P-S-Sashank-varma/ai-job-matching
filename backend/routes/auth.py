@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from database import db
+from database import users_collection
 from schemas import UserSchema, LoginSchema  # Ensure both schemas are imported
 from utils.security import hash_password, verify_password, create_jwt_token
 
@@ -9,7 +9,7 @@ router = APIRouter()
 @router.post("/register")
 async def register(user: UserSchema):
     # Check if the email is already registered
-    existing_user = await db.users.find_one({"email": user.email})
+    existing_user = await users_collection.find_one({"email": user.email})
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
 
@@ -23,7 +23,7 @@ async def register(user: UserSchema):
         "password": hashed_password,
         "role": user.role  # user or recruiter
     }
-    await db.users.insert_one(user_data)
+    await users_collection.insert_one(user_data)
 
     return {"message": "User registered successfully"}
 
@@ -31,7 +31,7 @@ async def register(user: UserSchema):
 @router.post("/login")
 async def login(user: LoginSchema):
     # Check if the user exists in MongoDB
-    db_user = await db.users.find_one({"email": user.email})
+    db_user = await users_collection.find_one({"email": user.email})
     if not db_user:
         raise HTTPException(status_code=400, detail="Invalid email or password")
 

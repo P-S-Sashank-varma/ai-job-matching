@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { fetchAppliedJobs as fetchAppliedJobsAPI } from "../services/api";
 export const checkExistingResume = async (userEmail, setHasExistingResume, setName, setPhone, activeTab, location) => {
   try {
-    const response = await fetch(`https://ai-job-matching-1w6g.onrender.com/check-resume/${userEmail}`);
+    const response = await fetch(`http://localhost:8000/check-resume/${userEmail}`);
     const data = await response.json();
     
     if (response.ok && data.hasResume) {
@@ -24,7 +24,7 @@ export const checkExistingResume = async (userEmail, setHasExistingResume, setNa
 
 export const fetchSelectedJobs = async (userEmail, setSelectedJobs) => {
   try {
-    const response = await fetch(`https://ai-job-matching-1w6g.onrender.com/matching-jobs/${userEmail}`);
+    const response = await fetch(`http://localhost:8000/matching-jobs/${userEmail}`);
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
@@ -69,7 +69,7 @@ export const handleResumeUpload = async (
 
   try {
     setLoading(true);
-    const uploadResponse = await fetch("https://ai-job-matching-1w6g.onrender.com/upload-resume", {
+    const uploadResponse = await fetch("http://localhost:8000/upload-resume", {
       method: "POST",
       body: formData,
     });
@@ -80,7 +80,7 @@ export const handleResumeUpload = async (
     }
 
     toast.success("Resume uploaded successfully!");
-    await fetch(`https://ai-job-matching-1w6g.onrender.com/parse-resume/${email}`);
+    await fetch(`http://localhost:8000/parse-resume/${email}`);
     
     setHasExistingResume(true);
     setActiveTab("jobs");
@@ -109,7 +109,7 @@ export const handleApply = async (jobId, email, hasExistingResume, setActiveTab,
 
   try {
     setLoading(true);
-    const response = await fetch("https://ai-job-matching-1w6g.onrender.com/apply-job", {
+    const response = await fetch("http://localhost:8000/apply-job", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -167,7 +167,7 @@ export const handleRegisterDrive = async (driveId, hasExistingResume, setActiveT
 };
 export const setupDrivesData = async (setUpcomingDrives) => {
   try {
-    const response = await fetch("https://ai-job-matching-1w6g.onrender.com/drives/");
+    const response = await fetch("http://localhost:8000/drives/");
     
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
@@ -211,7 +211,7 @@ export const fetchAppliedJobs = async (userEmail, setAppliedJobs) => {
         try {
           // Fetch job details from the backend using both userEmail and recruiterEmail
           const jobResponse = await fetch(
-            `https://ai-job-matching-1w6g.onrender.com/job-status/${encodeURIComponent(userEmail)}/${encodeURIComponent(status.recruiter_email)}`
+            `http://localhost:8000/job-status/${encodeURIComponent(userEmail)}/${encodeURIComponent(status.recruiter_email)}`
           );
 
           const defaultJob = {

@@ -55,7 +55,7 @@ async def get_user_dashboard(email: str):
         "email": user["email"],
         "phone": user["phone"],
         "resume_filename": user["resume_filename"],
-        "resume_url": f"http://127.0.0.1:8000/get-resume/{user['resume_filename']}"
+        "resume_url": f"http://localhost:8000/get-resume/{user['resume_filename']}"
     }
 
 

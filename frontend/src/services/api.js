@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'https://ai-job-matching-1w6g.onrender.com/api';
+const API_URL = 'http://localhost:8000/api';
 
 export const fetchUserJobStatuses = async (userEmail) => {
   try {

@@ -1,10 +1,9 @@
 from passlib.context import CryptContext
-import jwt
+from jose import jwt, JWTError, ExpiredSignatureError
 import os
 from dotenv import load_dotenv
 from fastapi import Depends, HTTPException, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-import jwt
 import os
 
 load_dotenv()
@@ -33,7 +32,7 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Security(securi
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
         return {"email": payload["email"], "role": payload.get("role", "user")}
-    except jwt.ExpiredSignatureError:
+    except ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
-    except jwt.InvalidTokenError:
+    except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")

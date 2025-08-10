@@ -11,7 +11,7 @@ const Jobs = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await fetch("https://ai-job-matching-1w6g.onrender.com/recruiter-dashboard");
+        const response = await fetch("http://localhost:8000/recruiter-dashboard");
         if (!response.ok) {
           throw new Error("Failed to fetch jobs");
         }
