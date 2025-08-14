@@ -106,7 +106,21 @@ async def get_company_image(filename: str):
     file_path = os.path.join(UPLOAD_DIR, filename)
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="Company image not found")
-    return FileResponse(file_path, media_type="image/jpeg", filename=filename)
+
+    # Detect content type based on file extension
+    ext = os.path.splitext(filename)[1].lower()
+    if ext in [".jpg", ".jpeg"]:
+        media_type = "image/jpeg"
+    elif ext == ".png":
+        media_type = "image/png"
+    elif ext == ".gif":
+        media_type = "image/gif"
+    elif ext == ".webp":
+        media_type = "image/webp"
+    else:
+        media_type = "application/octet-stream"
+
+    return FileResponse(file_path, media_type=media_type, filename=filename)
 
 
 # **🔹 GET Route: Retrieve Jobs Posted by a Specific Recruiter (Using Email)**

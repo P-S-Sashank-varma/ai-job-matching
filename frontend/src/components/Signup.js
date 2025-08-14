@@ -9,21 +9,29 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("user");  // Default role is "user"
   const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    const response = await fetch("https://ai-job-matching-zd8j.onrender.com/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password, role }), // Send all data
-    });
+    setIsSubmitting(true);
+    try {
+      const response = await fetch("https://ai-job-matching-zd8j.onrender.com/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password, role }), // Send all data
+      });
 
-    if (response.ok) {
-      alert("Signup successful. Please login.");
-      navigate("/login");  // Redirect to login page after successful signup
-    } else {
-      const errorData = await response.json();
-      alert(errorData.detail);
+      if (response.ok) {
+        alert("Signup successful. Please login.");
+        navigate("/login");  // Redirect to login page after successful signup
+      } else {
+        const errorData = await response.json();
+        alert(errorData.detail);
+      }
+    } catch (err) {
+      alert("Network error. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -66,7 +74,9 @@ const Signup = () => {
             <option value="user">User</option>
             <option value="recruiter">Recruiter</option>
           </select>
-          <button type="submit" className="auth-button">Sign Up</button>
+          <button type="submit" className="auth-button" disabled={isSubmitting} aria-busy={isSubmitting}>
+            {isSubmitting ? "Signing up..." : "Sign Up"}
+          </button>
         </form>
         <p>
           Already have an account? <Link to="/login">Login</Link>

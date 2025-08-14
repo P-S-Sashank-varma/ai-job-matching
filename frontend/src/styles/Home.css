@@ -111,7 +111,7 @@
 }
 
 /* Animation classes */
-.scroll-reveal {
+ .scroll-reveal {
   opacity: 0;
   transform: translateY(20px);
   transition: opacity 0.8s ease-out, transform 0.8s ease-out;
@@ -442,6 +442,17 @@
   transform: translateY(-2px);
 }
 
+/* Ensure Home resume CTA uses the intended primary style even if other pages define .primary-button */
+.resume-section .primary-button {
+  background-color: #0ea5e9 !important;
+  color: #fff !important;
+  border: none !important;
+}
+
+.resume-section .primary-button:hover {
+  background-color: #0284c7 !important;
+}
+
 /* Secondary button style */
 .secondary-button {
   background-color: #bae6fd;
@@ -569,6 +580,25 @@
   color: #6b7280;
   max-width: 48rem;
   margin: 0 auto;
+}
+
+/* Improve mobile readability for section headers */
+@media (max-width: 640px) {
+  .section-header {
+    padding: 0 0.75rem;
+  }
+  .section-title {
+    font-size: 1.75rem;
+    line-height: 1.25;
+    margin-bottom: 0.75rem;
+  }
+  .section-subtitle {
+    font-size: 0.985rem;
+    line-height: 1.6;
+  }
+  .features-section {
+    padding: 4rem 0;
+  }
 }
 
 .features-grid {
@@ -1066,6 +1096,7 @@
   border-bottom-left-radius: 0.5rem;
   outline: none;
   font-size: 0.875rem;
+  
 }
 
 .footer-input:focus {

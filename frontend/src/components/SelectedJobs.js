@@ -8,6 +8,7 @@ const SelectedJobs = () => {
   const [loading, setLoading] = useState(true);
   const [userEmail, setUserEmail] = useState("");
   const [completionStatus, setCompletionStatus] = useState({});
+  const [logoErrorMap, setLogoErrorMap] = useState({});
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -131,18 +132,30 @@ const SelectedJobs = () => {
 
             const completedRounds = getCompletedRoundsCount(job);
             const allCompleted = getAllRoundsCompleted(job);
+            const derivedLogoUrl = job.company_image_filename
+              ? `https://ai-job-matching-zd8j.onrender.com/get-company-image/${job.company_image_filename}`
+              : ((job.company_image_url && typeof job.company_image_url === 'string' && job.company_image_url.length > 0)
+                  ? job.company_image_url
+                  : null);
+            const companyInitial = (job.company || 'C').trim().charAt(0).toUpperCase();
 
             return (
               <div
                 key={index}
                 className={`job-card ${allCompleted ? "completed-job" : ""}`}
               >
-                <img
-                  src={job.company_image_url || "/default-logo.png"}
-                  alt="Company Logo"
-                  className="company-logo"
-                  onError={(e) => (e.target.src = "/default-logo.png")}
-                />
+                {derivedLogoUrl && !logoErrorMap[index] ? (
+                  <img
+                    src={derivedLogoUrl}
+                    alt={`${job.company || 'Company'} Logo`}
+                    className="company-logo"
+                    onError={() => setLogoErrorMap(prev => ({ ...prev, [index]: true }))}
+                  />
+                ) : (
+                  <div className="company-logo-fallback" aria-label={`${job.company || 'Company'} placeholder`}>
+                    {companyInitial}
+                  </div>
+                )}
 
                 <div className="job-info">
                   <h3>{job.company || "Unknown Company"}</h3>

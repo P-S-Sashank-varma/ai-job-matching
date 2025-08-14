@@ -78,9 +78,14 @@ const Jobs = () => {
           {filteredJobs.map((job, index) => (
             <div key={index} className="job-item-card">
               <img 
-                src={job.company_image_url} 
+                src={job.company_image_filename
+                  ? `https://ai-job-matching-zd8j.onrender.com/get-company-image/${job.company_image_filename}`
+                  : ((job.company_image_url && typeof job.company_image_url === 'string' && job.company_image_url.length > 0)
+                      ? job.company_image_url
+                      : '/logo192.png')}
                 alt={`${job.company} Logo`} 
-                className="company-image" 
+                className="company-image"
+                onError={(e) => { e.currentTarget.src = '/logo192.png'; }}
               />
 
               <div className="job-details">

@@ -120,6 +120,13 @@
   background-color: #2aa44b;
 }
 
+.auth-button[disabled],
+.auth-button[aria-busy="true"] {
+  opacity: 0.75;
+  cursor: not-allowed;
+  transform: none;
+}
+
 /* Role select */
 select {
   width: 100%;
