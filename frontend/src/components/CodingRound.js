@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import Editor from "@monaco-editor/react";
 import axios from "axios";
-import { updateRoundStatus } from "../services/api";
+import { updateRoundStatus, fetchSpecificJobStatus } from "../services/api";
 import "../styles/CodingRound.css";
 
 // Question Bank (5 Questions)
@@ -85,6 +85,8 @@ function CodingRound() {
   const [completed, setCompleted] = useState(false);
   const [timeLeft, setTimeLeft] = useState(15 * 60);
   const [userEmail, setUserEmail] = useState("");
+  const [isAlreadyCompleted, setIsAlreadyCompleted] = useState(false);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   // Get user email from token
@@ -100,17 +102,41 @@ function CodingRound() {
     }
   }, []);
 
+  // Check if test is already completed
+  useEffect(() => {
+    const checkCompletionStatus = async () => {
+      if (!userEmail || !recruiterEmail) return;
+      
+      try {
+        const status = await fetchSpecificJobStatus(userEmail, recruiterEmail);
+        if (status?.completion_status?.coding) {
+          setIsAlreadyCompleted(true);
+        }
+      } catch (error) {
+        console.error("Error checking completion status:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkCompletionStatus();
+  }, [userEmail, recruiterEmail]);
+
   // Load 3 Random Questions on Every Page Load
   useEffect(() => {
-    setQuestions(getRandomQuestions());
-  }, []);
+    if (!isAlreadyCompleted) {
+      setQuestions(getRandomQuestions());
+    }
+  }, [isAlreadyCompleted]);
 
   // Timer Effect
   useEffect(() => {
-    if (timeLeft <= 0) handleNextQuestion();
-    const timer = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
-    return () => clearInterval(timer);
-  }, [timeLeft]);
+    if (timeLeft <= 0 && !isAlreadyCompleted) handleNextQuestion();
+    if (!isAlreadyCompleted) {
+      const timer = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
+      return () => clearInterval(timer);
+    }
+  }, [timeLeft, isAlreadyCompleted]);
 
   // Save completion status to backend when completed
   useEffect(() => {
@@ -120,6 +146,45 @@ function CodingRound() {
         .catch(error => console.error("Error updating coding status:", error));
     }
   }, [completed, score, userEmail, recruiterEmail]);
+
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <h2>Loading...</h2>
+      </div>
+    );
+  }
+
+  if (isAlreadyCompleted) {
+    return (
+      <div className="coding-main-container">
+        <div className="coding-round-container">
+          <div className="coding-header">
+            <h1>Coding Round</h1>
+          </div>
+          
+          <div className="completion-section">
+            <div className="completion-card">
+              <h2>Test Already Completed</h2>
+              
+              <div className="success-message">
+                <h3>✅ Already Completed</h3>
+                <p>You have already completed the coding round for this job application.</p>
+                <p>You cannot retake this test. Please continue with the hiring process.</p>
+              </div>
+              
+              <div className="action-buttons">
+                <button onClick={handleBackToHRInterview} className="continue-button">
+                  Return to Hiring Process
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (questions.length === 0) {
     return (

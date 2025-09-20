@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import { updateRoundStatus } from "../services/api";
+import { updateRoundStatus, fetchSpecificJobStatus } from "../services/api";
 import "../styles/Aptitude.css";
 
 // 10 Aptitude Questions
@@ -33,6 +33,8 @@ function Aptitude() {
   const [timeLeft, setTimeLeft] = useState(10 * 60); // 10 minutes total
   const [completed, setCompleted] = useState(false);
   const [userEmail, setUserEmail] = useState("");
+  const [isAlreadyCompleted, setIsAlreadyCompleted] = useState(false);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   // Get user email from token
@@ -48,17 +50,41 @@ function Aptitude() {
     }
   }, []);
 
+  // Check if test is already completed
   useEffect(() => {
-    setQuestions(getRandomQuestions());
-  }, []);
+    const checkCompletionStatus = async () => {
+      if (!userEmail || !recruiterEmail) return;
+      
+      try {
+        const status = await fetchSpecificJobStatus(userEmail, recruiterEmail);
+        if (status?.completion_status?.aptitude) {
+          setIsAlreadyCompleted(true);
+        }
+      } catch (error) {
+        console.error("Error checking completion status:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkCompletionStatus();
+  }, [userEmail, recruiterEmail]);
 
   useEffect(() => {
-    if (timeLeft <= 0) {
+    if (!isAlreadyCompleted) {
+      setQuestions(getRandomQuestions());
+    }
+  }, [isAlreadyCompleted]);
+
+  useEffect(() => {
+    if (timeLeft <= 0 && !isAlreadyCompleted) {
       setCompleted(true);
     }
-    const timer = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
-    return () => clearInterval(timer);
-  }, [timeLeft]);
+    if (!isAlreadyCompleted) {
+      const timer = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
+      return () => clearInterval(timer);
+    }
+  }, [timeLeft, isAlreadyCompleted]);
 
   useEffect(() => {
     if (completed && score >= questions.length * 0.7 && userEmail) {
@@ -67,6 +93,31 @@ function Aptitude() {
         .catch(error => console.error("Error updating aptitude status:", error));
     }
   }, [completed, score, questions.length, recruiterEmail, userEmail]);
+
+  if (loading) return <div className="loading">Loading...</div>;
+
+  if (isAlreadyCompleted) {
+    return (
+      <div className="aptitude-container">
+        <header className="exam-header">
+          <h1>Aptitude Assessment</h1>
+        </header>
+
+        <div className="exam-content">
+          <div className="result-container">
+            <h2>Test Already Completed</h2>
+            <div className="result-message success">
+              <p>✅ You have already completed the aptitude assessment for this job application.</p>
+              <p className="next-step-message">You cannot retake this test. Please continue with the hiring process.</p>
+              <button onClick={handleBackToHRInterview} className="continue-button">
+                Return to Hiring Process
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (questions.length === 0) return <div className="loading">Loading Questions...</div>;
 

@@ -209,6 +209,13 @@
 
 .step-button.completed {
   background-color: var(--success);
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.step-button.completed:hover {
+  background-color: var(--success);
+  cursor: not-allowed;
 }
 
 .interview-section {

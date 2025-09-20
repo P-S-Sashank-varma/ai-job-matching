@@ -287,7 +287,8 @@ const HRInterview = ({ userName }) => {
                   <p>Problem-solving assessment</p>
                   <button 
                     className={`step-button ${completionData.aptitude ? 'completed' : ''}`}
-                    onClick={goToAptitude}
+                    onClick={completionData.aptitude ? null : goToAptitude}
+                    disabled={completionData.aptitude}
                   >
                     {completionData.aptitude ? 'Completed' : 'Start Test'}
                   </button>
@@ -304,8 +305,8 @@ const HRInterview = ({ userName }) => {
                   <p>Technical skills assessment</p>
                   <button 
                     className={`step-button ${completionData.coding ? 'completed' : ''}`}
-                    onClick={goToCoding}
-                    disabled={!completionData.aptitude}
+                    onClick={completionData.coding ? null : goToCoding}
+                    disabled={!completionData.aptitude || completionData.coding}
                   >
                     {completionData.coding ? 'Completed' : completionData.aptitude ? 'Start Challenge' : 'Complete Aptitude First'}
                   </button>
@@ -322,8 +323,8 @@ const HRInterview = ({ userName }) => {
                   <p>AI-powered interview simulation</p>
                   <button 
                     className={`step-button ${completionData.hr ? 'completed' : ''}`}
-                    onClick={() => setShowInterview(true)} 
-                    disabled={!completionData.coding}
+                    onClick={completionData.hr ? null : () => setShowInterview(true)}
+                    disabled={!completionData.coding || completionData.hr}
                   >
                     {completionData.hr ? 'Completed' : completionData.coding ? 'Start Interview' : 'Complete Coding First'}
                   </button>
