@@ -3,8 +3,11 @@ import { useParams, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import emailjs from "@emailjs/browser";
 import { fetchSpecificJobStatus, updateRoundStatus, markAllRoundsEmailSent } from "../services/api";
-import "../styles/HRInterview.css";
-import { CheckCircle } from "lucide-react";
+import { Button } from "./ui/Button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/Card";
+import { Badge } from "./ui/Badge";
+import { Input } from "./ui/Input";
+import { CheckCircle, Brain, Code, MessageSquare, Play, Clock, Loader2, ArrowRight } from "lucide-react";
 
 const HRInterview = ({ userName }) => {
   const { recruiterEmail } = useParams();
@@ -259,193 +262,355 @@ const HRInterview = ({ userName }) => {
   const goToSelectedJobs = () => navigate("/selected-jobs");
 
   return (
-    <div className="main-container">
-      <div className="interview-container">
-        <div className="header-section">
-          <h1 className="title">Smart Hire AI</h1>
-          <p className="subtitle">AI-powered hiring assistant</p>
-        </div>
-
-        <div className="recruiter-info">
-          <div className="info-card">
-            <h3>Recruiter</h3>
-            <p>{decodedRecruiterEmail}</p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="max-w-6xl mx-auto p-6">
+        {/* Header */}
+        <div className="text-center mb-8 animate-fade-in-up">
+          <div className="flex items-center justify-center space-x-2 mb-4">
+            <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl"></div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              SmartHire AI
+            </h1>
           </div>
+          <p className="text-gray-600">AI-powered hiring assessment platform</p>
         </div>
 
-        <div className="progress-tracker">
-          <div className="progress-card">
-            <h2>Hiring Process</h2>
-            <div className="steps-container">
-              <div className={`step ${completionData.aptitude ? 'completed' : ''}`}>
-                <div className="step-icon">
-                  {completionData.aptitude && <CheckCircle className="check-icon" />}
-                  <span className="step-number">1</span>
-                </div>
-                <div className="step-content">
-                  <h3>Aptitude Test</h3>
-                  <p>Problem-solving assessment</p>
-                  <button 
-                    className={`step-button ${completionData.aptitude ? 'completed' : ''}`}
+        {/* Recruiter Info */}
+        <Card className="mb-8 bg-white/80 backdrop-blur-sm shadow-lg animate-fade-in">
+          <CardContent className="p-6">
+            <div className="text-center">
+              <Badge className="mb-2 bg-blue-100 text-blue-800">Current Application</Badge>
+              <p className="text-lg font-semibold text-gray-900">{decodedRecruiterEmail}</p>
+              <p className="text-sm text-gray-600">Recruiter Contact</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Progress Tracker */}
+        <Card className="mb-8 bg-white/80 backdrop-blur-sm shadow-lg animate-fade-in">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-center text-gray-900">
+              Assessment Progress
+            </CardTitle>
+            <CardDescription className="text-center text-gray-600">
+              Complete all three rounds to finish your application
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* Aptitude Test */}
+              <div className={`relative p-6 rounded-xl border-2 transition-all duration-300 ${
+                completionData.aptitude 
+                  ? 'bg-green-50 border-green-200 shadow-lg' 
+                  : 'bg-gray-50 border-gray-200 hover:border-blue-300 hover:shadow-md'
+              }`}>
+                <div className="text-center">
+                  <div className={`w-12 h-12 mx-auto mb-4 rounded-full flex items-center justify-center text-white font-bold text-lg ${
+                    completionData.aptitude 
+                      ? 'bg-green-500' 
+                      : 'bg-gray-400'
+                  }`}>
+                    {completionData.aptitude ? (
+                      <CheckCircle className="w-6 h-6" />
+                    ) : (
+                      <Brain className="w-6 h-6" />
+                    )}
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Aptitude Test</h3>
+                  <p className="text-sm text-gray-600 mb-4">Problem-solving assessment</p>
+                  <Button 
                     onClick={completionData.aptitude ? null : goToAptitude}
                     disabled={completionData.aptitude}
+                    className={`w-full ${
+                      completionData.aptitude 
+                        ? 'bg-green-500 hover:bg-green-500 cursor-not-allowed opacity-80' 
+                        : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700'
+                    }`}
+                    size="sm"
                   >
-                    {completionData.aptitude ? 'Completed' : 'Start Test'}
-                  </button>
+                    {completionData.aptitude ? (
+                      <>
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        Completed
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-4 h-4 mr-2" />
+                        Start Test
+                      </>
+                    )}
+                  </Button>
                 </div>
               </div>
 
-              <div className={`step ${completionData.coding ? 'completed' : ''}`}>
-                <div className="step-icon">
-                  {completionData.coding && <CheckCircle className="check-icon" />}
-                  <span className="step-number">2</span>
-                </div>
-                <div className="step-content">
-                  <h3>Coding Challenge</h3>
-                  <p>Technical skills assessment</p>
-                  <button 
-                    className={`step-button ${completionData.coding ? 'completed' : ''}`}
+              {/* Coding Challenge */}
+              <div className={`relative p-6 rounded-xl border-2 transition-all duration-300 ${
+                completionData.coding 
+                  ? 'bg-green-50 border-green-200 shadow-lg' 
+                  : completionData.aptitude 
+                    ? 'bg-gray-50 border-gray-200 hover:border-blue-300 hover:shadow-md' 
+                    : 'bg-gray-100 border-gray-200 opacity-60'
+              }`}>
+                <div className="text-center">
+                  <div className={`w-12 h-12 mx-auto mb-4 rounded-full flex items-center justify-center text-white font-bold text-lg ${
+                    completionData.coding 
+                      ? 'bg-green-500' 
+                      : completionData.aptitude 
+                        ? 'bg-blue-500' 
+                        : 'bg-gray-400'
+                  }`}>
+                    {completionData.coding ? (
+                      <CheckCircle className="w-6 h-6" />
+                    ) : (
+                      <Code className="w-6 h-6" />
+                    )}
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Coding Challenge</h3>
+                  <p className="text-sm text-gray-600 mb-4">Technical skills assessment</p>
+                  <Button 
                     onClick={completionData.coding ? null : goToCoding}
                     disabled={!completionData.aptitude || completionData.coding}
+                    className={`w-full ${
+                      completionData.coding 
+                        ? 'bg-green-500 hover:bg-green-500 cursor-not-allowed opacity-80' 
+                        : completionData.aptitude 
+                          ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700'
+                          : 'bg-gray-400 hover:bg-gray-400 cursor-not-allowed'
+                    }`}
+                    size="sm"
                   >
-                    {completionData.coding ? 'Completed' : completionData.aptitude ? 'Start Challenge' : 'Complete Aptitude First'}
-                  </button>
+                    {completionData.coding ? (
+                      <>
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        Completed
+                      </>
+                    ) : completionData.aptitude ? (
+                      <>
+                        <Play className="w-4 h-4 mr-2" />
+                        Start Challenge
+                      </>
+                    ) : (
+                      <>
+                        <Clock className="w-4 h-4 mr-2" />
+                        Complete Aptitude First
+                      </>
+                    )}
+                  </Button>
                 </div>
               </div>
 
-              <div className={`step ${completionData.hr ? 'completed' : ''}`}>
-                <div className="step-icon">
-                  {completionData.hr && <CheckCircle className="check-icon" />}
-                  <span className="step-number">3</span>
-                </div>
-                <div className="step-content">
-                  <h3>HR Interview</h3>
-                  <p>AI-powered interview simulation</p>
-                  <button 
-                    className={`step-button ${completionData.hr ? 'completed' : ''}`}
+              {/* HR Interview */}
+              <div className={`relative p-6 rounded-xl border-2 transition-all duration-300 ${
+                completionData.hr 
+                  ? 'bg-green-50 border-green-200 shadow-lg' 
+                  : completionData.coding 
+                    ? 'bg-gray-50 border-gray-200 hover:border-blue-300 hover:shadow-md' 
+                    : 'bg-gray-100 border-gray-200 opacity-60'
+              }`}>
+                <div className="text-center">
+                  <div className={`w-12 h-12 mx-auto mb-4 rounded-full flex items-center justify-center text-white font-bold text-lg ${
+                    completionData.hr 
+                      ? 'bg-green-500' 
+                      : completionData.coding 
+                        ? 'bg-purple-500' 
+                        : 'bg-gray-400'
+                  }`}>
+                    {completionData.hr ? (
+                      <CheckCircle className="w-6 h-6" />
+                    ) : (
+                      <MessageSquare className="w-6 h-6" />
+                    )}
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">HR Interview</h3>
+                  <p className="text-sm text-gray-600 mb-4">AI-powered interview simulation</p>
+                  <Button 
                     onClick={completionData.hr ? null : () => setShowInterview(true)}
                     disabled={!completionData.coding || completionData.hr}
+                    className={`w-full ${
+                      completionData.hr 
+                        ? 'bg-green-500 hover:bg-green-500 cursor-not-allowed opacity-80' 
+                        : completionData.coding 
+                          ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700'
+                          : 'bg-gray-400 hover:bg-gray-400 cursor-not-allowed'
+                    }`}
+                    size="sm"
                   >
-                    {completionData.hr ? 'Completed' : completionData.coding ? 'Start Interview' : 'Complete Coding First'}
-                  </button>
+                    {completionData.hr ? (
+                      <>
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        Completed
+                      </>
+                    ) : completionData.coding ? (
+                      <>
+                        <Play className="w-4 h-4 mr-2" />
+                        Start Interview
+                      </>
+                    ) : (
+                      <>
+                        <Clock className="w-4 h-4 mr-2" />
+                        Complete Coding First
+                      </>
+                    )}
+                  </Button>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
+        {/* Interview Section */}
         {showInterview && (
-          <div className="interview-section">
-            <div className="interview-card">
-              <h2>AI HR Interview</h2>
-              
+          <Card className="bg-white/80 backdrop-blur-sm shadow-lg animate-fade-in">
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold text-center text-gray-900 flex items-center justify-center">
+                <MessageSquare className="w-6 h-6 mr-2 text-purple-600" />
+                AI HR Interview
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
               {score === null ? (
                 <>
                   {!questions.length ? (
-                    <div className="interview-setup">
-                      <h3>Interview Setup</h3>
-                      <p className="instruction">
-                        Enter your skills to generate personalized interview questions:
-                      </p>
-                      <div className="input-group">
-                        <input
-                          type="text"
+                    <div className="text-center max-w-md mx-auto">
+                      <div className="mb-6">
+                        <Brain className="w-16 h-16 text-purple-600 mx-auto mb-4" />
+                        <h3 className="text-xl font-semibold text-gray-900 mb-2">Interview Setup</h3>
+                        <p className="text-gray-600">
+                          Enter your key skills to generate personalized interview questions tailored to your expertise.
+                        </p>
+                      </div>
+                      <div className="space-y-4">
+                        <Input
                           value={skills}
                           onChange={(e) => setSkills(e.target.value)}
-                          placeholder="e.g., Python, React, Machine Learning"
-                          className="skills-input"
+                          placeholder="e.g., Python, React, Machine Learning, Data Analysis"
+                          className="text-center"
                         />
+                        <Button
+                          onClick={fetchQuestions}
+                          disabled={loading || !skills.trim()}
+                          className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                          size="lg"
+                        >
+                          {loading ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Generating Questions...
+                            </>
+                          ) : (
+                            <>
+                              <Play className="w-4 h-4 mr-2" />
+                              Start Interview
+                            </>
+                          )}
+                        </Button>
                       </div>
-                      <button
-                        onClick={fetchQuestions}
-                        className="start-interview-button"
-                        disabled={loading}
-                      >
-                        {loading ? "Generating Questions..." : "Start Interview"}
-                      </button>
                     </div>
                   ) : (
-                    <div className="question-section">
-                      <div className="question-progress">
-                        Question {currentQuestionIndex + 1} of {questions.length}
+                    <div className="max-w-3xl mx-auto">
+                      <div className="mb-6">
+                        <Badge className="mb-4 bg-purple-100 text-purple-800">
+                          Question {currentQuestionIndex + 1} of {questions.length}
+                        </Badge>
+                        <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+                          <div 
+                            className="bg-gradient-to-r from-purple-600 to-pink-600 h-2 rounded-full transition-all duration-300" 
+                            style={{width: `${((currentQuestionIndex + 1) / questions.length) * 100}%`}}
+                          ></div>
+                        </div>
                       </div>
-                      <div className="question-card">
-                        <p className="question">
-                          {questions[currentQuestionIndex]}
-                        </p>
+                      
+                      <Card className="mb-6 border-l-4 border-purple-500">
+                        <CardContent className="p-6">
+                          <p className="text-lg text-gray-900 leading-relaxed">
+                            {questions[currentQuestionIndex]}
+                          </p>
+                        </CardContent>
+                      </Card>
+
+                      <div className="space-y-4">
                         <textarea
-                          rows="6"
+                          rows={6}
                           value={answers[currentQuestionIndex] || ""}
                           onChange={handleAnswerChange}
-                          placeholder="Type your answer here..."
-                          className="answer-textarea"
+                          placeholder="Type your detailed answer here... Be specific and provide examples where possible."
+                          className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none"
                         />
-                        <button
-                          onClick={handleNextQuestion}
-                          className="next-button"
-                          disabled={evaluating || !answers[currentQuestionIndex]}
-                        >
-                          {currentQuestionIndex < questions.length - 1
-                            ? "Next Question"
-                            : "Submit Interview"}
-                        </button>
+                        <div className="flex justify-end">
+                          <Button
+                            onClick={handleNextQuestion}
+                            disabled={evaluating || !answers[currentQuestionIndex]?.trim()}
+                            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                            size="lg"
+                          >
+                            {currentQuestionIndex < questions.length - 1 ? (
+                              <>
+                                Next Question
+                                <ArrowRight className="w-4 h-4 ml-2" />
+                              </>
+                            ) : (
+                              <>
+                                Submit Interview
+                                <CheckCircle className="w-4 h-4 ml-2" />
+                              </>
+                            )}
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   )}
                 </>
               ) : (
-                <div className="results-section">
-                  <div className="results-card">
-                    <h3>Interview Completed</h3>
-                    {evaluating ? (
-                      <div className="evaluating">
-                        <div className="loading-spinner"></div>
-                        <p>Evaluating your responses...</p>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="score-display">
-                          <div className="score-circle">
-                            <span className="score-value">{score}</span>
-                            <span className="score-max">/10</span>
-                          </div>
+                <div className="text-center max-w-2xl mx-auto">
+                  {evaluating ? (
+                    <div className="py-12">
+                      <Loader2 className="w-16 h-16 text-purple-600 mx-auto mb-4 animate-spin" />
+                      <h3 className="text-xl font-semibold text-gray-900 mb-2">Evaluating Your Responses</h3>
+                      <p className="text-gray-600">Our AI is analyzing your answers and calculating your score...</p>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="mb-8">
+                        <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center text-white text-3xl font-bold">
+                          {score}
                         </div>
-                        <p className="score-message">
-                          {score >= 7 ? "Excellent performance! We'll be in touch soon." : 
-                           score >= 5 ? "Good job! Your application has been submitted." : 
-                           "Thanks for completing the interview."}
+                        <h3 className="text-2xl font-bold text-gray-900 mb-2">Interview Completed!</h3>
+                        <p className="text-lg text-gray-600">
+                          Your Score: {score}/10 ({Math.round((score / 10) * 100)}%)
                         </p>
-                        {(emailSent || emailAlreadySent) && (
-                          <div className="email-sent-banner" style={{
-                            marginTop: "12px",
-                            padding: "10px 12px",
-                            borderRadius: "6px",
-                            background: "#e6ffed",
-                            color: "#05612f",
-                            border: "1px solid #b7f5c8"
-                          }}>
-                            {emailAlreadySent ? "Email has already been sent to the recruiter." : "Email has been sent to the recruiter."}
-                          </div>
-                        )}
+                        <p className="mt-4 text-gray-700">
+                          {score >= 7 ? "🎉 Excellent performance! We'll be in touch soon." : 
+                           score >= 5 ? "👍 Good job! Your application has been submitted." : 
+                           "✨ Thanks for completing the interview."}
+                        </p>
+                      </div>
 
-                        <div className="post-interview-actions">
-                          {checkAllRoundsCompleted() ? (
-                            <button onClick={goToSelectedJobs} className="view-jobs-button">
-                              View All Applications
-                            </button>
-                          ) : (
-                            <button onClick={() => window.location.reload()} className="restart-button">
-                              Start New Application
-                            </button>
-                          )}
+                      {(emailSent || emailAlreadySent) && (
+                        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                          <div className="flex items-center justify-center text-green-800">
+                            <CheckCircle className="w-5 h-5 mr-2" />
+                            {emailAlreadySent ? "Recruiter has been notified previously" : "Recruiter has been notified successfully"}
+                          </div>
                         </div>
-                      </>
-                    )}
-                  </div>
+                      )}
+
+                      <div className="space-y-4">
+                        {checkAllRoundsCompleted() ? (
+                          <Button onClick={goToSelectedJobs} size="lg" className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700">
+                            View All Applications
+                          </Button>
+                        ) : (
+                          <Button onClick={() => window.location.reload()} size="lg" variant="outline">
+                            Start New Application
+                          </Button>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         )}
       </div>
     </div>

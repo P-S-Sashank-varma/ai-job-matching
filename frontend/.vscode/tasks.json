@@ -1,0 +1,11 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Install Tailwind CSS and Shadcn UI",
+			"type": "shell",
+			"command": "npm install -D tailwindcss postcss autoprefixer && npx tailwindcss init -p && npm install @radix-ui/react-slot class-variance-authority clsx tailwind-merge lucide-react",
+			"group": "build"
+		}
+	]
+}

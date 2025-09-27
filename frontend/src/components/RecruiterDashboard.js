@@ -1,6 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
-import "../styles/RecruiterDashboard.css";
+import { Plus, Briefcase, Calendar, LogOut, User } from "lucide-react";
+import { Button } from './ui/Button';
+import { Card } from './ui/Card';
+import { Badge } from './ui/Badge';
+import Logo from './ui/Logo';
 import { PostJobTab } from "./RecruiterDashboardTabs/PostJobTab";
 import { PostedJobsTab } from "./RecruiterDashboardTabs/PostedJobsTab";
 import { ConductDriveTab } from "./RecruiterDashboardTabs/ConductDriveTab";
@@ -205,99 +209,168 @@ function RecruiterDashboard() {
   };
 
   return (
-    <div className="recruiter-dashboard">
-      <div className="dashboard-header">
-        <span className="dashboard-tag">Recruiter Portal</span>
-        <h1>Welcome, {recruiterName || "Recruiter"}</h1>
-        <p>Manage your job postings and recruitment drives all in one place.</p>
-      </div>
-
-      <div className="tabs">
-        <div 
-          className={`tab ${activeTab === "post-job" ? "active" : ""}`}
-          onClick={() => setActiveTab("post-job")}
-        >
-          {editingJobId ? "Edit Job" : "Post a New Job"}
-        </div>
-        <div 
-          className={`tab ${activeTab === "posted-jobs" ? "active" : ""}`}
-          onClick={() => setActiveTab("posted-jobs")}
-        >
-          Posted Jobs
-        </div>
-        <div 
-          className={`tab ${activeTab === "conduct-drive" ? "active" : ""}`}
-          onClick={() => setActiveTab("conduct-drive")}
-        >
-          Conduct a Drive
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-rose-50">
+      {/* Modern Header */}
+      <div className="bg-white/80 backdrop-blur-lg border-b border-white/20 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center gap-3">
+              <Logo size={32} className="drop-shadow-sm" />
+              <div>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">SmartHire AI</h1>
+                <p className="text-sm text-gray-600">Recruiter Portal - Welcome, {recruiterName || "Recruiter"}</p>
+              </div>
+            </div>
+            
+            <Button 
+              onClick={handleLogout} 
+              variant="ghost" 
+              size="sm"
+              className="flex items-center gap-2 text-gray-600 hover:text-red-600"
+            >
+              <LogOut className="w-4 h-4" />
+              Logout
+            </Button>
+          </div>
         </div>
       </div>
 
-      <div className="dashboard-content">
-        {activeTab === "post-job" && (
-          <PostJobTab 
-            editingJobId={editingJobId}
-            recruiterName={recruiterName}
-            setRecruiterName={setRecruiterName}
-            email={email}
-            company={company}
-            setCompany={setCompany}
-            companyImagePreview={companyImagePreview}
-            skillsRequired={skillsRequired}
-            setSkillsRequired={setSkillsRequired}
-            salaryRange={salaryRange}
-            setSalaryRange={setSalaryRange}
-            jobLocation={jobLocation}
-            setJobLocation={setJobLocation}
-            Matchingpercentage={Matchingpercentage}
-            setMatchingpercentage={setMatchingpercentage}
-            location={location}
-            setLocation={setLocation}
-            jobDescription={jobDescription}
-            setJobDescription={setJobDescription}
-            handleCompanyImageChange={handleCompanyImageChange}
-            companyImageInputRef={companyImageInputRef}
-            resetForm={resetForm}
-            handleSubmit={submitJobForm}
-          />
-        )}
-        
-        {activeTab === "posted-jobs" && (
-          <PostedJobsTab 
-            loading={loading}
-            postedJobs={postedJobs}
-            handleEditJob={handleJobEdit}
-            handleDeleteJob={handleJobDelete}
-            setActiveTab={setActiveTab}
-          />
-        )}
-        
-        {activeTab === "conduct-drive" && (
-          <ConductDriveTab 
-            driveName={driveName}
-            setDriveName={setDriveName}
-            driveCapacity={driveCapacity}
-            setDriveCapacity={setDriveCapacity}
-            driveDate={driveDate}
-            setDriveDate={setDriveDate}
-            driveTime={driveTime}
-            setDriveTime={setDriveTime}
-            driveLocation={driveLocation}
-            setDriveLocation={setDriveLocation}
-            driveDescription={driveDescription}
-            setDriveDescription={setDriveDescription}
-            recruiterEmail1={recruiterEmail1}
-            recruiterName1={recruiterName1}
-            setRecruiterEmail1={setRecruiterEmail1}
-            setRecruiterName1={setRecruiterName1}
-            drives={drives}
-            loadingDrives={loadingDrives}
-            handleDeleteDrive={handleDriveDelete}
-            handleDriveSubmit={submitDriveForm}
-          />
-        )}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header Section */}
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-2">
+            Recruitment Dashboard
+          </h2>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Manage your job postings and recruitment drives all in one place. 
+            Connect with the best candidates using our AI-powered matching system.
+          </p>
+        </div>
+
+        {/* Modern Tabs */}
+        <div className="mb-8">
+          <Card className="backdrop-blur-lg bg-white/80 border-white/20 shadow-xl p-2">
+            <div className="flex space-x-2">
+              <Button
+                onClick={() => setActiveTab("post-job")}
+                variant={activeTab === "post-job" ? "default" : "ghost"}
+                className={`flex items-center gap-2 px-4 py-3 font-medium transition-all duration-200 ${
+                  activeTab === "post-job" 
+                    ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg' 
+                    : 'text-gray-700 hover:text-orange-600 hover:bg-orange-50'
+                }`}
+              >
+                <Plus className="w-4 h-4" />
+                {editingJobId ? "Edit Job" : "Post New Job"}
+              </Button>
+              
+              <Button
+                onClick={() => setActiveTab("posted-jobs")}
+                variant={activeTab === "posted-jobs" ? "default" : "ghost"}
+                className={`flex items-center gap-2 px-4 py-3 font-medium transition-all duration-200 ${
+                  activeTab === "posted-jobs" 
+                    ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg' 
+                    : 'text-gray-700 hover:text-orange-600 hover:bg-orange-50'
+                }`}
+              >
+                <Briefcase className="w-4 h-4" />
+                Posted Jobs
+                {postedJobs.length > 0 && (
+                  <Badge variant="secondary" className="ml-1">
+                    {postedJobs.length}
+                  </Badge>
+                )}
+              </Button>
+              
+              <Button
+                onClick={() => setActiveTab("conduct-drive")}
+                variant={activeTab === "conduct-drive" ? "default" : "ghost"}
+                className={`flex items-center gap-2 px-4 py-3 font-medium transition-all duration-200 ${
+                  activeTab === "conduct-drive" 
+                    ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg' 
+                    : 'text-gray-700 hover:text-orange-600 hover:bg-orange-50'
+                }`}
+              >
+                <Calendar className="w-4 h-4" />
+                Conduct Drive
+                {drives.length > 0 && (
+                  <Badge variant="secondary" className="ml-1">
+                    {drives.length}
+                  </Badge>
+                )}
+              </Button>
+            </div>
+          </Card>
+        </div>
+
+        {/* Content Area */}
+        <Card className="backdrop-blur-lg bg-white/80 border-white/20 shadow-xl">
+          <div className="p-8">
+            {activeTab === "post-job" && (
+              <PostJobTab 
+                editingJobId={editingJobId}
+                recruiterName={recruiterName}
+                setRecruiterName={setRecruiterName}
+                email={email}
+                company={company}
+                setCompany={setCompany}
+                companyImagePreview={companyImagePreview}
+                skillsRequired={skillsRequired}
+                setSkillsRequired={setSkillsRequired}
+                salaryRange={salaryRange}
+                setSalaryRange={setSalaryRange}
+                jobLocation={jobLocation}
+                setJobLocation={setJobLocation}
+                Matchingpercentage={Matchingpercentage}
+                setMatchingpercentage={setMatchingpercentage}
+                location={location}
+                setLocation={setLocation}
+                jobDescription={jobDescription}
+                setJobDescription={setJobDescription}
+                handleCompanyImageChange={handleCompanyImageChange}
+                companyImageInputRef={companyImageInputRef}
+                resetForm={resetForm}
+                handleSubmit={submitJobForm}
+              />
+            )}
+            
+            {activeTab === "posted-jobs" && (
+              <PostedJobsTab 
+                loading={loading}
+                postedJobs={postedJobs}
+                handleEditJob={handleJobEdit}
+                handleDeleteJob={handleJobDelete}
+                setActiveTab={setActiveTab}
+              />
+            )}
+            
+            {activeTab === "conduct-drive" && (
+              <ConductDriveTab 
+                driveName={driveName}
+                setDriveName={setDriveName}
+                driveCapacity={driveCapacity}
+                setDriveCapacity={setDriveCapacity}
+                driveDate={driveDate}
+                setDriveDate={setDriveDate}
+                driveTime={driveTime}
+                setDriveTime={setDriveTime}
+                driveLocation={driveLocation}
+                setDriveLocation={setDriveLocation}
+                driveDescription={driveDescription}
+                setDriveDescription={setDriveDescription}
+                recruiterEmail1={recruiterEmail1}
+                recruiterName1={recruiterName1}
+                setRecruiterEmail1={setRecruiterEmail1}
+                setRecruiterName1={setRecruiterName1}
+                drives={drives}
+                loadingDrives={loadingDrives}
+                handleDeleteDrive={handleDriveDelete}
+                handleDriveSubmit={submitDriveForm}
+              />
+            )}
+          </div>
+        </Card>
       </div>
-      <button onClick={handleLogout} style={{position: 'absolute', top: 20, right: 20, padding: '8px 18px', background: '#5b7fff', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 600, cursor: 'pointer'}}>Logout</button>
     </div>
   );
 }

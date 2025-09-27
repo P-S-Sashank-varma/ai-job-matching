@@ -1,5 +1,8 @@
 import React from "react";
-import { Calendar, Briefcase, MapPin } from "lucide-react";
+import { Calendar, Briefcase, MapPin, Edit, Trash2 } from "lucide-react";
+import { Card } from '../ui/Card';
+import { Button } from '../ui/Button';
+import { Badge } from '../ui/Badge';
 
 export const PostedJobsTab = ({ 
   loading, 
@@ -8,147 +11,112 @@ export const PostedJobsTab = ({
   handleDeleteJob, 
   setActiveTab 
 }) => {
-  const getLocationClass = (jobLocationType) => {
+  const getLocationVariant = (jobLocationType) => {
     switch (jobLocationType) {
-      case "Remote": return "job-tag job-remote";
-      case "Onsite": return "job-tag job-onsite";
-      case "Hybrid": return "job-tag job-hybrid";
-      default: return "job-tag";
+      case "Remote": return "success";
+      case "Onsite": return "warning";
+      case "Hybrid": return "secondary";
+      default: return "default";
     }
   };
 
   return (
-    <div className="dashboard-section" style={{ gridColumn: "span 2" }}>
-      <div className="section-header">
-        <h2>Posted Jobs</h2>
-        <div className="section-header-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-          </svg>
+    <div className="p-6 bg-gradient-to-br from-yellow-100/90 to-orange-100/90 rounded-xl border border-yellow-200/50 shadow-lg space-y-6">
+      <div className="flex items-center justify-between pb-4 border-b border-orange-200">
+        <div className="flex items-center gap-3">
+          <Briefcase className="w-6 h-6 text-orange-600" />
+          <h2 className="text-2xl font-bold text-gray-900">Posted Jobs</h2>
         </div>
       </div>
-      <div className="section-content">
-        {loading ? (
-          <div className="loading">
-            <div className="loading-spinner"></div>
-            <span>Loading jobs...</span>
-          </div>
-        ) : postedJobs.length > 0 ? (
-          <div className="jobs-grid">
-            {postedJobs.map((job) => (
-              <div key={job.id} className="job-card">
-                <div className="job-card-header">
+      
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
+          <span className="ml-3 text-gray-600">Loading jobs...</span>
+        </div>
+      ) : postedJobs.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {postedJobs.map((job) => (
+            <Card key={job.id} className="bg-gradient-to-br from-white/90 to-yellow-50/90 border-yellow-200 hover:shadow-lg transition-shadow duration-200">
+              <div className="p-4">
+                <div className="flex items-start justify-between mb-3">
                   {job.company_image ? (
                     <img 
                       src={job.company_image} 
                       alt={job.company} 
-                      className="job-company-logo" 
+                      className="w-12 h-12 object-cover rounded-lg border border-gray-200" 
                     />
                   ) : (
-                    <div className="job-company-logo" style={{ background: '#f5f5f7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6e6e73" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                      </svg>
+                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                      <Briefcase className="w-6 h-6 text-gray-400" />
                     </div>
                   )}
-                  <div className="job-title-container">
-                    <h3>{job.company}</h3>
-                    <div className="job-company">{job.location}</div>
+                  <div className="flex gap-2">
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handleEditJob(job)}
+                      className="p-2 h-8 w-8"
+                    >
+                      <Edit className="w-3 h-3" />
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handleDeleteJob(job.id)}
+                      className="p-2 h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
                   </div>
-
-                  
                 </div>
                 
-                <div className="job-card-content">
-                  <div className="job-detail">
-                    <span className="job-detail-icon">
-                      <Briefcase size={16} />
-                    </span>
-                    <span className="job-detail-text">Salary_Range: {job.salary_range}</span>
-                  </div>
-
-                  
-                  <div className="job-detail">
-                    <span className="job-detail-icon">
-                      <Calendar size={16} />
-                    </span>
-                    <span className="job-detail-text">
-                      Posted: {job.date_posted ? new Date(job.date_posted).toLocaleDateString('en-US', { 
-                        year: 'numeric', 
-                        month: 'short', 
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      }) : "Recently"}
-                    </span>
-                  </div>
-                  
-                  <div className="job-detail">
-                    <span className="job-detail-icon">
-                      <MapPin size={16} />
-                    </span>
-                    <span className={getLocationClass(job.job_location)}>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">{job.company}</h3>
+                <p className="text-sm text-gray-600 mb-3 line-clamp-2">{job.job_description}</p>
+                
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <MapPin className="w-4 h-4" />
+                    <Badge variant={getLocationVariant(job.job_location)}>
                       {job.job_location}
-                    </span>
+                    </Badge>
+                    {job.location && <span>• {job.location}</span>}
                   </div>
+                  
+                  {job.skills_required && (
+                    <div className="text-sm text-gray-600">
+                      <span className="font-medium">Skills:</span> {job.skills_required}
+                    </div>
+                  )}
+                  
+                  {job.salary_range && (
+                    <div className="text-sm text-gray-600">
+                      <span className="font-medium">Salary:</span> {job.salary_range}
+                    </div>
+                  )}
                 </div>
                 
-                <div className="job-card-actions">
-                  <button 
-                    className="btn btn-secondary btn-icon"
-                    onClick={() => handleEditJob(job)}
-                    title="Edit Job"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                    </svg>
-                  </button>
-                  
-                  <button 
-                    className="btn btn-destructive btn-icon"
-                    onClick={() => handleDeleteJob(job.id)}
-                    title="Delete Job"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="3 6 5 6 21 6"></polyline>
-                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                      <line x1="10" y1="11" x2="10" y2="17"></line>
-                      <line x1="14" y1="11" x2="14" y2="17"></line>
-                    </svg>
-                  </button>
+                <div className="flex items-center justify-between text-xs text-gray-500 pt-3 border-t border-gray-100">
+                  <span>Job ID: {job.id}</span>
+                  {job.match_percentage && (
+                    <Badge variant="secondary">{job.match_percentage}% Match</Badge>
+                  )}
                 </div>
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="no-jobs">
-            <div className="no-jobs-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-              </svg>
-            </div>
-            <p>No jobs posted yet. Create your first job posting!</p>
-            <button 
-              className="btn btn-primary"
-              onClick={() => setActiveTab("post-job")}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12h14"></path>
-                <path d="M12 5v14"></path>
-              </svg>
-              Post a New Job
-            </button>
-          </div>
-        )}
-      </div>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <Briefcase className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No jobs posted yet</h3>
+          <p className="text-gray-600 mb-4">Start by posting your first job to attract candidates.</p>
+          <Button onClick={() => setActiveTab("post-job")}>
+            Post New Job
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
-
-export default PostedJobsTab;
 

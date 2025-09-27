@@ -31,19 +31,19 @@ export const PostJobTab = ({
   handleSubmit
 }) => {
   return (
-    <div className="p-6 bg-gradient-to-br from-slate-50 to-blue-50/30 rounded-xl border border-slate-200/70 shadow-lg backdrop-blur-sm space-y-8">
-      <div className="text-center border-b border-slate-200 pb-6">
+    <div className="space-y-8">
+      <div className="text-center border-b border-gray-200 pb-6">
         <div className="flex items-center justify-center gap-2 mb-4">
           {editingJobId ? (
             <Edit className="w-6 h-6 text-blue-600" />
           ) : (
             <Plus className="w-6 h-6 text-blue-600" />
           )}
-          <h2 className="text-3xl font-bold text-slate-800">
+          <h2 className="text-3xl font-bold text-gray-900">
             {editingJobId ? "Edit Job" : "Post a New Job"}
           </h2>
         </div>
-        <p className="text-slate-600 max-w-2xl mx-auto">
+        <p className="text-gray-600 max-w-2xl mx-auto">
           {editingJobId 
             ? "Update your job posting details below."
             : "Create a new job posting to attract the best candidates."}
@@ -53,7 +53,7 @@ export const PostJobTab = ({
       <form className="space-y-6" onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-slate-700">Recruiter Name</label>
+            <label className="block text-sm font-medium text-gray-700">Recruiter Name</label>
             <Input 
               type="text" 
               value={recruiterName} 
@@ -64,7 +64,7 @@ export const PostJobTab = ({
           </div>
           
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-slate-700">Email</label>
+            <label className="block text-sm font-medium text-gray-700">Email</label>
             <Input 
               type="email" 
               value={email} 
@@ -76,7 +76,7 @@ export const PostJobTab = ({
         </div>
           
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-slate-700">Company Name</label>
+          <label className="block text-sm font-medium text-gray-700">Company Name</label>
           <Input 
             type="text" 
             value={company} 
@@ -87,7 +87,7 @@ export const PostJobTab = ({
         </div>
           
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-slate-700">Company Logo</label>
+          <label className="block text-sm font-medium text-gray-700">Company Logo</label>
           <div className="flex items-center space-x-4">
             <input 
               type="file" 
@@ -114,7 +114,7 @@ export const PostJobTab = ({
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-slate-700">Skills Required</label>
+            <label className="block text-sm font-medium text-gray-700">Skills Required</label>
             <Input 
               type="text" 
               value={skillsRequired} 
@@ -125,7 +125,7 @@ export const PostJobTab = ({
           </div>
           
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-slate-700">Salary Range</label>
+            <label className="block text-sm font-medium text-gray-700">Salary Range</label>
             <Input 
               type="text" 
               value={salaryRange} 
@@ -134,13 +134,11 @@ export const PostJobTab = ({
               required 
             />
           </div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-slate-700">Job Location Type</label>
+          
+          <div className="form-group">
+            <label>Job Location Type</label>
             <select 
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+              className="form-control select-control" 
               value={jobLocation} 
               onChange={(e) => setJobLocation(e.target.value)} 
               required
@@ -151,59 +149,82 @@ export const PostJobTab = ({
             </select>
           </div>
 
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-slate-700">Matching Percentage</label>
-            <Input 
+          <div className="form-group">
+            <label>Matching Percentage</label>
+            <input 
               type="number" 
+              className="form-control" 
               value={Matchingpercentage} 
               onChange={(e) => setMatchingpercentage(e.target.value)} 
-              placeholder="e.g. 85" 
               required 
             />
           </div>
-        </div>
-        
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-slate-700">Location</label>
-          <Input 
-            type="text" 
-            value={location} 
-            onChange={(e) => setLocation(e.target.value)} 
-            placeholder="e.g. New York, NY" 
-            required 
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-slate-700">Job Description</label>
-          <textarea 
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[120px] resize-vertical" 
-            value={jobDescription} 
-            onChange={(e) => setJobDescription(e.target.value)} 
-            placeholder="Describe the job responsibilities and requirements..." 
-            required
-          />
-        </div>
-        
-        <div className="flex justify-end space-x-4 pt-6">
-          <Button 
-            type="submit" 
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            {editingJobId ? "Update Job" : "Post Job"}
-          </Button>
           
-          {editingJobId && (
-            <Button 
-              type="button" 
-              variant="outline"
-              onClick={resetForm}
+          <div className="form-group">
+            <label>Location</label>
+            <input 
+              type="text" 
+              className="form-control" 
+              value={location} 
+              onChange={(e) => setLocation(e.target.value)} 
+              placeholder="e.g. New York, NY" 
+              required 
+            />
+          </div>
+          
+          <div className="form-group">
+            <label>Job Description</label>
+            <textarea 
+              className="form-control textarea-control" 
+              value={jobDescription} 
+              onChange={(e) => setJobDescription(e.target.value)} 
+              placeholder="Describe the job responsibilities and requirements..." 
+              required
+            ></textarea>
+          </div>
+          
+          <div className="form-actions">
+            <button 
+              type="submit" 
+              className="btn btn-primary"
             >
-              Cancel
-            </Button>
-          )}
-        </div>
-      </form>
+              {editingJobId ? (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                    <polyline points="7 3 7 8 15 8"></polyline>
+                  </svg>
+                  Update Job
+                </>
+              ) : (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                    <polyline points="7 3 7 8 15 8"></polyline>
+                  </svg>
+                  Post Job
+                </>
+              )}
+            </button>
+            
+            {editingJobId && (
+              <button 
+                type="button" 
+                className="btn btn-secondary"
+                onClick={resetForm}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5"></path>
+                  <path d="M12 19l-7-7 7-7"></path>
+                </svg>
+                Cancel
+              </button>
+            )}
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
